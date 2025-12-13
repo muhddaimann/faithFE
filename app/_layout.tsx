@@ -24,10 +24,8 @@ function Providers() {
       />
 
       <SafeAreaView
-        style={{
-          flex: 1,
-          backgroundColor: theme.colors.background,
-        }}
+        edges={["top"]}
+        style={{ flex: 1, backgroundColor: theme.colors.background }}
       >
         <Slot />
       </SafeAreaView>

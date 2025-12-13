@@ -75,5 +75,52 @@ Music-powered travel companion built with **Expo**, **React Native**, and **expo
 │  ├─ No messaging or social feed.
 │  ├─ No complex travel planning/itineraries.
 
+traveltune/
+├─ app/
+│  ├─ (modals)/
+│  │  └─ _layout.tsx
+│  ├─ (tabs)/
+│  │  ├─ a/ --discover
+│  │  │  ├─ _layout.tsx
+│  │  │  └─ index.tsx
+│  │  ├─ b/ --play
+│  │  │  ├─ _layout.tsx
+│  │  │  └─ index.tsx
+│  │  ├─ c/ --journey
+│  │  │  ├─ _layout.tsx
+│  │  │  └─ index.tsx
+│  │  ├─ d/ --settings
+│  │  │  ├─ _layout.tsx
+│  │  │  └─ index.tsx
+│  │  └─ _layout.tsx
+│  ├─ _layout.tsx
+│  ├─ welcome.tsx --signInRouteHere
+│  ├─ goodbye.tsx --signOutRouteHere
+│  ├─ signUp.tsx
+│  ├─ signIn.tsx
+│  ├─ land.tsx --welcomeUserRegisterOrLogin
+│  └─ index.tsx --onboard
+├─ assets/
+├─ components/
+│  └─ shared/
+│     ├─ header.tsx
+│     └─ navBar.tsx
+├─ constants/
+│  ├─ design.ts
+│  └─ theme.ts
+├─ contexts/
+│  ├─ authContext.tsx
+│  ├─ designContext.tsx
+│  ├─ themeContext.tsx
+│  └─ tokenContext.tsx
+├─ hooks/
+├─ .gitignore
+├─ app.json
+├─ package-lock.json
+├─ package.json
+├─ README.md
+└─ tsconfig.json
+
+
 
 ```

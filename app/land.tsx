@@ -5,7 +5,7 @@ import { useAppTheme } from "../contexts/themeContext";
 import { useDesign } from "../contexts/designContext";
 import { router } from "expo-router";
 
-export default function Onboarding() {
+export default function Land() {
   const { theme } = useAppTheme();
   const { design } = useDesign();
 
@@ -23,29 +23,34 @@ export default function Onboarding() {
       }}
     >
       <Text
-        variant="headlineLarge"
+        variant="headlineMedium"
         style={{ color: theme.colors.onBackground, textAlign: "center" }}
       >
-        TravelTune
+        Welcome to TravelTune
       </Text>
 
       <Text
         variant="bodyLarge"
         style={{
+          marginTop: design.spacing.md,
+          marginBottom: design.spacing.xl,
           color: theme.colors.onBackground,
           textAlign: "center",
-          marginTop: design.spacing.md,
         }}
       >
-        Travel deeper. Feel the world through music.
+        Your soundtrack for every journey.
       </Text>
 
       <Button
         mode="contained"
-        style={{ marginTop: design.spacing.xl }}
-        onPress={() => router.replace("/land")}
+        style={{ marginBottom: design.spacing.md }}
+        onPress={() => router.push("/signUp")}
       >
-        Continue
+        Create Account
+      </Button>
+
+      <Button mode="outlined" onPress={() => router.push("/signIn")}>
+        Sign In
       </Button>
     </ScrollView>
   );
