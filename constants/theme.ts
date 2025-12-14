@@ -2,7 +2,7 @@ import { MD3DarkTheme, MD3LightTheme, type MD3Theme } from "react-native-paper";
 
 const make = (
   family: string,
-  weight: "400" | "700",
+  weight: "400" | "500" | "600" | "700",
   fontSize: number,
   lineHeight: number,
   letterSpacing = 0
@@ -15,33 +15,35 @@ const make = (
 });
 
 const tokenMap = {
-  displayLarge: make("Poppins_700Bold", "700", 57, 64),
-  displayMedium: make("Poppins_700Bold", "700", 45, 52),
-  displaySmall: make("Poppins_700Bold", "700", 36, 44),
+  displayLarge: make("PlusJakartaSans_700Bold", "700", 57, 64),
+  displayMedium: make("PlusJakartaSans_700Bold", "700", 45, 52),
+  displaySmall: make("PlusJakartaSans_700Bold", "700", 36, 44),
 
-  headlineLarge: make("Poppins_700Bold", "700", 32, 40),
-  headlineMedium: make("Poppins_700Bold", "700", 28, 36),
-  headlineSmall: make("Poppins_700Bold", "700", 24, 32),
+  headlineLarge: make("PlusJakartaSans_700Bold", "700", 32, 40),
+  headlineMedium: make("PlusJakartaSans_700Bold", "700", 28, 36),
+  headlineSmall: make("PlusJakartaSans_600SemiBold", "600", 24, 32),
 
-  titleLarge: make("Poppins_700Bold", "700", 22, 28),
-  titleMedium: make("Poppins_700Bold", "700", 16, 24, 0.1),
-  titleSmall: make("Poppins_700Bold", "700", 14, 20, 0.1),
+  titleLarge: make("PlusJakartaSans_600SemiBold", "600", 22, 28),
+  titleMedium: make("PlusJakartaSans_600SemiBold", "600", 16, 24, 0.1),
+  titleSmall: make("PlusJakartaSans_600SemiBold", "600", 14, 20, 0.1),
 
-  labelLarge: make("Poppins_700Bold", "700", 14, 20, 0.1),
-  labelMedium: make("Poppins_400Regular", "400", 12, 16, 0.5),
-  labelSmall: make("Poppins_400Regular", "400", 11, 16, 0.5),
+  labelLarge: make("Inter_600SemiBold", "600", 14, 20, 0.1),
+  labelMedium: make("Inter_500Medium", "500", 12, 16, 0.5),
+  labelSmall: make("Inter_400Regular", "400", 11, 16, 0.5),
 
-  bodyLarge: make("Poppins_400Regular", "400", 16, 24),
-  bodyMedium: make("Poppins_400Regular", "400", 14, 20),
-  bodySmall: make("Poppins_400Regular", "400", 12, 16),
+  bodyLarge: make("Inter_400Regular", "400", 16, 24),
+  bodyMedium: make("Inter_400Regular", "400", 14, 20),
+  bodySmall: make("Inter_400Regular", "400", 12, 16),
 } as const;
 
 const fonts = tokenMap as unknown as MD3Theme["fonts"];
 
 export const requiredFontNames = {
-  regular: "Poppins_400Regular",
-  medium: "Poppins_500Medium",
-  bold: "Poppins_700Bold",
+  jakartaSemiBold: "PlusJakartaSans_600SemiBold",
+  jakartaBold: "PlusJakartaSans_700Bold",
+  interRegular: "Inter_400Regular",
+  interMedium: "Inter_500Medium",
+  interSemiBold: "Inter_600SemiBold",
 };
 
 export const lightTheme: MD3Theme = {
