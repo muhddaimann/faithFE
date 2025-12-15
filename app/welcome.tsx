@@ -19,6 +19,9 @@ export default function Welcome() {
 
   return (
     <ScrollView
+      bounces={false}
+      overScrollMode="never"
+      showsVerticalScrollIndicator={false}
       contentContainerStyle={{
         flexGrow: 1,
         alignItems: "center",
@@ -27,13 +30,19 @@ export default function Welcome() {
         backgroundColor: theme.colors.background,
       }}
     >
-      <Text variant="headlineMedium" style={{ color: theme.colors.onBackground }}>
+      <Text
+        variant="headlineMedium"
+        style={{ color: theme.colors.onBackground }}
+      >
         Welcome back!
       </Text>
 
       <Text
         variant="bodyLarge"
-        style={{ marginTop: design.spacing.md, color: theme.colors.onBackground }}
+        style={{
+          marginTop: design.spacing.md,
+          color: theme.colors.onBackground,
+        }}
       >
         Loading your journeys…
       </Text>

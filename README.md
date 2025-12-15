@@ -80,47 +80,62 @@ traveltune/
 │  ├─ (modals)/
 │  │  └─ _layout.tsx
 │  ├─ (tabs)/
-│  │  ├─ a/ --discover
+│  │  ├─ a/
+│  │  │  ├─ _layout.tsx
+│  │  │  ├─ browseCity.tsx
+│  │  │  ├─ index.tsx
+│  │  │  ├─ nearbySuggest.tsx
+│  │  │  └─ travelMood.tsx
+│  │  ├─ b/
 │  │  │  ├─ _layout.tsx
 │  │  │  └─ index.tsx
-│  │  ├─ b/ --play
+│  │  ├─ c/
 │  │  │  ├─ _layout.tsx
 │  │  │  └─ index.tsx
-│  │  ├─ c/ --journey
-│  │  │  ├─ _layout.tsx
-│  │  │  └─ index.tsx
-│  │  ├─ d/ --settings
+│  │  ├─ d/
 │  │  │  ├─ _layout.tsx
 │  │  │  └─ index.tsx
 │  │  └─ _layout.tsx
 │  ├─ _layout.tsx
-│  ├─ welcome.tsx --signInRouteHere
-│  ├─ goodbye.tsx --signOutRouteHere
-│  ├─ signUp.tsx
+│  ├─ goodbye.tsx
+│  ├─ index.tsx
+│  ├─ land.tsx
 │  ├─ signIn.tsx
-│  ├─ land.tsx --welcomeUserRegisterOrLogin
-│  └─ index.tsx --onboard
+│  ├─ signUp.tsx
+│  └─ welcome.tsx
 ├─ assets/
 ├─ components/
+│  ├─ a/
+│  │  └─ header.tsx
+│  ├─ b/
 │  └─ shared/
+│     ├─ customGrid.tsx
 │     ├─ header.tsx
-│     └─ navBar.tsx
+│     ├─ horizontalList.tsx
+│     ├─ masonryGrid.tsx
+│     ├─ navBar.tsx
+│     ├─ promptUI.tsx
+│     └─ sectionHeader.tsx
 ├─ constants/
 │  ├─ design.ts
 │  └─ theme.ts
 ├─ contexts/
 │  ├─ authContext.tsx
+│  ├─ appContext.tsx
 │  ├─ designContext.tsx
+│  ├─ tabContext.tsx
 │  ├─ themeContext.tsx
 │  └─ tokenContext.tsx
 ├─ hooks/
+│  ├─ useDiscover.ts
+│  ├─ useJourney.ts
+│  └─ usePlay.ts
 ├─ .gitignore
 ├─ app.json
 ├─ package-lock.json
 ├─ package.json
 ├─ README.md
 └─ tsconfig.json
-
 
 
 ```

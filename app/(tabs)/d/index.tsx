@@ -3,11 +3,12 @@ import { ScrollView } from "react-native";
 import { Text, List, Switch } from "react-native-paper";
 import { useAppTheme } from "../../../contexts/themeContext";
 import { useDesign } from "../../../contexts/designContext";
-import { router } from "expo-router";
+import useAuth from "../../../hooks/useAuth";
 
 export default function Settings() {
   const { theme, mode } = useAppTheme();
   const { design } = useDesign();
+  const { logout } = useAuth();
 
   return (
     <ScrollView
@@ -52,7 +53,7 @@ export default function Settings() {
         left={(props) => (
           <List.Icon {...props} icon="logout" color={theme.colors.error} />
         )}
-        onPress={() => router.push("/goodbye")}
+        onPress={logout}
         style={{
           marginTop: design.spacing.lg,
           borderTopWidth: 1,

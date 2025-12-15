@@ -10,27 +10,17 @@ import {
   Pressable,
 } from "react-native";
 import { Text, TextInput, Button } from "react-native-paper";
-import { UserPlus } from "lucide-react-native";
+import { KeyRound } from "lucide-react-native";
+import { router } from "expo-router";
 import { useAppTheme } from "../contexts/themeContext";
 import { useDesign } from "../contexts/designContext";
 import AppHeader from "../components/shared/header";
-import useAuth from "../hooks/useAuth";
-import { useApp } from "../contexts/appContext";
 
-export default function SignUp() {
+export default function ForgotPassword() {
   const { theme } = useAppTheme();
   const { design } = useDesign();
-  const { signUp } = useAuth();
-  const { markLaunched } = useApp();
 
-  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
-  const [pass, setPass] = useState("");
-  const [confirmPass, setConfirmPass] = useState("");
-
-  const emailRef = useRef<any>(null);
-  const passRef = useRef<any>(null);
-  const confirmRef = useRef<any>(null);
 
   const enterOpacity = useRef(new Animated.Value(0)).current;
   const enterY = useRef(new Animated.Value(16)).current;
@@ -54,7 +44,7 @@ export default function SignUp() {
 
     const show = Keyboard.addListener("keyboardWillShow", () => {
       Animated.spring(liftY, {
-        toValue: -24,
+        toValue: -20,
         damping: 20,
         stiffness: 160,
         mass: 0.6,
@@ -77,15 +67,6 @@ export default function SignUp() {
       hide.remove();
     };
   }, []);
-
-  const onSubmit = async () => {
-    if (!username || !pass || pass !== confirmPass) return;
-
-    const ok = await signUp(username, pass);
-    if (ok) {
-      await markLaunched();
-    }
-  };
 
   return (
     <KeyboardAvoidingView
@@ -125,19 +106,24 @@ export default function SignUp() {
                   width: 64,
                   height: 64,
                   borderRadius: 32,
-                  backgroundColor: theme.colors.primaryContainer,
+                  backgroundColor: theme.colors.secondaryContainer,
                   alignItems: "center",
                   justifyContent: "center",
+                  shadowColor: theme.colors.secondary,
+                  shadowOpacity: 0.18,
+                  shadowRadius: 14,
+                  shadowOffset: { width: 0, height: 6 },
+                  elevation: 6,
                 }}
               >
-                <UserPlus size={26} color={theme.colors.onPrimaryContainer} />
+                <KeyRound size={26} color={theme.colors.onSecondaryContainer} />
               </View>
 
               <Text
                 variant="headlineMedium"
                 style={{ color: theme.colors.onBackground }}
               >
-                Create Account
+                Reset Password
               </Text>
 
               <Text
@@ -148,52 +134,19 @@ export default function SignUp() {
                   maxWidth: 300,
                 }}
               >
-                Start your journey and let music guide every step.
+                Enter your email and we’ll send you instructions to reset your
+                password.
               </Text>
             </View>
 
             <TextInput
-              label="Username"
-              value={username}
-              onChangeText={setUsername}
-              mode="outlined"
-              autoCapitalize="none"
-              returnKeyType="next"
-              onSubmitEditing={() => emailRef.current?.focus()}
-            />
-
-            <TextInput
-              ref={emailRef}
               label="Email"
               value={email}
               onChangeText={setEmail}
               mode="outlined"
               autoCapitalize="none"
               keyboardType="email-address"
-              returnKeyType="next"
-              onSubmitEditing={() => passRef.current?.focus()}
-            />
-
-            <TextInput
-              ref={passRef}
-              label="Password"
-              value={pass}
-              onChangeText={setPass}
-              secureTextEntry
-              mode="outlined"
-              returnKeyType="next"
-              onSubmitEditing={() => confirmRef.current?.focus()}
-            />
-
-            <TextInput
-              ref={confirmRef}
-              label="Confirm Password"
-              value={confirmPass}
-              onChangeText={setConfirmPass}
-              secureTextEntry
-              mode="outlined"
               returnKeyType="done"
-              onSubmitEditing={onSubmit}
             />
 
             <Button
@@ -203,10 +156,22 @@ export default function SignUp() {
                 borderRadius: design.radii.lg,
               }}
               contentStyle={{ height: 48 }}
-              onPress={onSubmit}
+              onPress={() => router.back()}
             >
-              Sign Up
+              Send Reset Link
             </Button>
+
+            <Pressable
+              onPress={() => router.back()}
+              style={{ alignSelf: "center", marginTop: design.spacing.sm }}
+            >
+              <Text
+                variant="labelMedium"
+                style={{ color: theme.colors.primary }}
+              >
+                Back to Sign In
+              </Text>
+            </Pressable>
           </Animated.View>
         </ScrollView>
       </Pressable>
