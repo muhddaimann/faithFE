@@ -1,8 +1,7 @@
 import React from "react";
-import { ScrollView, View } from "react-native";
-import { Text } from "react-native-paper";
+import { ScrollView } from "react-native";
 import { useRouter } from "expo-router";
-import { Clock, Calendar, CalendarCheck, Bell } from "lucide-react-native";
+import { Calendar, CalendarCheck, Bell } from "lucide-react-native";
 import { useAppTheme } from "../../../contexts/themeContext";
 import { useDesign } from "../../../contexts/designContext";
 import { useTabsUi } from "../../../contexts/tabContext";
@@ -10,13 +9,27 @@ import Header from "../../../components/a/header";
 import SectionHeader from "../../../components/shared/sectionHeader";
 import useHome from "../../../hooks/useHome";
 import TodayUI from "../../../components/a/todayUI";
+import AttendanceUI from "../../../components/a/attendanceUI";
+import LeaveUI from "../../../components/a/leaveUI";
+import AnnouncementUI from "../../../components/a/announcementUI";
 
 export default function Home() {
   const { theme } = useAppTheme();
   const { design } = useDesign();
   const { updateByOffset } = useTabsUi();
   const router = useRouter();
-  const { today, attendance, leave, announcements } = useHome();
+  const { attendance, leave, announcements } = useHome();
+
+  const attendanceRecords = attendance.map((item) => ({
+    id: item.id,
+    date: item.date,
+    status: item.status,
+    checkIn: item.status !== "absent" ? "09:12 AM" : undefined,
+    checkOut:
+      item.status === "onTime" || item.status === "late"
+        ? "06:04 PM"
+        : undefined,
+  }));
 
   return (
     <ScrollView
@@ -25,19 +38,14 @@ export default function Home() {
       style={{ flex: 1, backgroundColor: theme.colors.background }}
       contentContainerStyle={{
         padding: design.spacing.md,
-        paddingBottom: design.spacing["2xl"] * 3,
+        paddingBottom: design.spacing["2xl"] * 4,
       }}
       onScroll={(e) => updateByOffset(e.nativeEvent.contentOffset.y)}
       scrollEventThrottle={16}
     >
       <Header />
-      <View
-        style={{
-          paddingBottom: design.spacing.lg,
-        }}
-      >
-        <TodayUI />
-      </View>
+
+      <TodayUI />
 
       <SectionHeader
         title="Attendance"
@@ -45,133 +53,22 @@ export default function Home() {
         icon={Calendar}
         onPress={() => router.push("/(tabs)/b")}
       />
-
-      {attendance.length ? (
-        attendance.map((item) => (
-          <View
-            key={item.id}
-            style={{
-              padding: design.spacing.md,
-              borderRadius: design.radii.lg,
-              backgroundColor: theme.colors.surfaceVariant,
-              marginBottom: design.spacing.sm,
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <Text
-              variant="bodyMedium"
-              style={{ color: theme.colors.onBackground }}
-            >
-              {item.date}
-            </Text>
-            <Text
-              variant="bodySmall"
-              style={{ color: theme.colors.onSurfaceVariant }}
-            >
-              {item.status}
-            </Text>
-          </View>
-        ))
-      ) : (
-        <View
-          style={{
-            padding: design.spacing.md,
-            borderRadius: design.radii.lg,
-            backgroundColor: theme.colors.surfaceVariant,
-            marginBottom: design.spacing.lg,
-          }}
-        >
-          <Text
-            variant="bodyMedium"
-            style={{ color: theme.colors.onSurfaceVariant }}
-          >
-            No recent attendance records.
-          </Text>
-        </View>
-      )}
+      <AttendanceUI records={attendanceRecords} />
 
       <SectionHeader
         title="Leave"
-        subtitle="Balance & requests"
+        subtitle="Balance & Application"
         icon={CalendarCheck}
         onPress={() => router.push("/(tabs)/c")}
       />
-
-      <View
-        style={{
-          padding: design.spacing.md,
-          borderRadius: design.radii.lg,
-          backgroundColor: theme.colors.surfaceVariant,
-          marginBottom: design.spacing.lg,
-        }}
-      >
-        <Text
-          variant="bodyMedium"
-          style={{ color: theme.colors.onSurfaceVariant }}
-        >
-          Leave balance: {leave.balance} days
-        </Text>
-        {leave.pending > 0 && (
-          <Text
-            variant="bodySmall"
-            style={{ color: theme.colors.onSurfaceVariant, marginTop: 4 }}
-          >
-            {leave.pending} request(s) pending approval
-          </Text>
-        )}
-      </View>
+      <LeaveUI annualBalance={leave.balance} pendingCount={leave.pending} />
 
       <SectionHeader
         title="Announcements"
         subtitle="Company updates"
         icon={Bell}
       />
-
-      {announcements.length ? (
-        announcements.map((item) => (
-          <View
-            key={item.id}
-            style={{
-              padding: design.spacing.md,
-              borderRadius: design.radii.lg,
-              backgroundColor: theme.colors.surfaceVariant,
-              marginBottom: design.spacing.sm,
-            }}
-          >
-            <Text
-              variant="bodyMedium"
-              style={{ color: theme.colors.onBackground }}
-            >
-              {item.title}
-            </Text>
-            <Text
-              variant="bodySmall"
-              style={{
-                color: theme.colors.onSurfaceVariant,
-                marginTop: 2,
-              }}
-            >
-              {item.summary}
-            </Text>
-          </View>
-        ))
-      ) : (
-        <View
-          style={{
-            padding: design.spacing.md,
-            borderRadius: design.radii.lg,
-            backgroundColor: theme.colors.surfaceVariant,
-          }}
-        >
-          <Text
-            variant="bodyMedium"
-            style={{ color: theme.colors.onSurfaceVariant }}
-          >
-            No new announcements.
-          </Text>
-        </View>
-      )}
+      <AnnouncementUI items={announcements} />
     </ScrollView>
   );
 }

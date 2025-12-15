@@ -10,6 +10,7 @@ type SectionHeaderProps = {
   subtitle?: string;
   icon?: React.ComponentType<{ size?: number; color?: string }>;
   onPress?: () => void;
+  rightSlot?: React.ReactNode;
 };
 
 export default function SectionHeader({
@@ -17,6 +18,7 @@ export default function SectionHeader({
   subtitle,
   icon: Icon,
   onPress,
+  rightSlot,
 }: SectionHeaderProps) {
   const { theme } = useAppTheme();
   const { design } = useDesign();
@@ -58,7 +60,9 @@ export default function SectionHeader({
         </View>
       </View>
 
-      {onPress && (
+      {rightSlot ? (
+        rightSlot
+      ) : onPress ? (
         <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
             <Text variant="labelMedium" style={{ color: theme.colors.primary }}>
@@ -67,7 +71,7 @@ export default function SectionHeader({
             <ChevronRight size={16} color={theme.colors.primary} />
           </View>
         </TouchableOpacity>
-      )}
+      ) : null}
     </View>
   );
 }

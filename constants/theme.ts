@@ -15,25 +15,25 @@ const make = (
 });
 
 const tokenMap = {
-  displayLarge: make("PlusJakartaSans_700Bold", "700", 57, 64),
-  displayMedium: make("PlusJakartaSans_700Bold", "700", 45, 52),
-  displaySmall: make("PlusJakartaSans_700Bold", "700", 36, 44),
+  displayLarge: make("PlusJakartaSans_700Bold", "700", 60, 68),
+  displayMedium: make("PlusJakartaSans_700Bold", "700", 48, 56),
+  displaySmall: make("PlusJakartaSans_700Bold", "700", 38, 46),
 
-  headlineLarge: make("PlusJakartaSans_700Bold", "700", 32, 40),
-  headlineMedium: make("PlusJakartaSans_700Bold", "700", 28, 36),
-  headlineSmall: make("PlusJakartaSans_600SemiBold", "600", 24, 32),
+  headlineLarge: make("PlusJakartaSans_700Bold", "700", 34, 42),
+  headlineMedium: make("PlusJakartaSans_700Bold", "700", 30, 38),
+  headlineSmall: make("PlusJakartaSans_600SemiBold", "600", 26, 34),
 
-  titleLarge: make("PlusJakartaSans_600SemiBold", "600", 22, 28),
-  titleMedium: make("PlusJakartaSans_600SemiBold", "600", 16, 24, 0.1),
-  titleSmall: make("PlusJakartaSans_600SemiBold", "600", 14, 20, 0.1),
+  titleLarge: make("PlusJakartaSans_600SemiBold", "600", 24, 30),
+  titleMedium: make("PlusJakartaSans_600SemiBold", "600", 18, 26, 0.1),
+  titleSmall: make("PlusJakartaSans_600SemiBold", "600", 16, 22, 0.1),
 
-  labelLarge: make("Inter_600SemiBold", "600", 14, 20, 0.1),
-  labelMedium: make("Inter_500Medium", "500", 12, 16, 0.5),
-  labelSmall: make("Inter_400Regular", "400", 11, 16, 0.5),
+  labelLarge: make("Inter_600SemiBold", "600", 15, 20, 0.1),
+  labelMedium: make("Inter_500Medium", "500", 13, 18, 0.5),
+  labelSmall: make("Inter_400Regular", "400", 12, 16, 0.5),
 
-  bodyLarge: make("Inter_400Regular", "400", 16, 24),
-  bodyMedium: make("Inter_400Regular", "400", 14, 20),
-  bodySmall: make("Inter_400Regular", "400", 12, 16),
+  bodyLarge: make("Inter_400Regular", "400", 17, 26),
+  bodyMedium: make("Inter_400Regular", "400", 15, 22),
+  bodySmall: make("Inter_400Regular", "400", 13, 18),
 } as const;
 
 const fonts = tokenMap as unknown as MD3Theme["fonts"];

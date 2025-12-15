@@ -59,6 +59,24 @@ export default function useHome() {
       summary: "Updated remote work policy is now available in Documents.",
       date: "16 Sep",
     },
+    {
+      id: "a4",
+      title: "Policy Update",
+      summary: "Updated remote work policy is now available in Documents.",
+      date: "16 Sep",
+    },
+    {
+      id: "a5",
+      title: "Policy Update",
+      summary: "Updated remote work policy is now available in Documents.",
+      date: "16 Sep",
+    },
+    {
+      id: "a6",
+      title: "Policy Update",
+      summary: "Updated remote work policy is now available in Documents.",
+      date: "16 Sep",
+    },
   ];
 
   return {

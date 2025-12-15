@@ -1,13 +1,16 @@
 import React, { useState } from "react";
-import { ScrollView, View } from "react-native";
-import { Text, Button } from "react-native-paper";
+import { ScrollView } from "react-native";
 import { useAppTheme } from "../../../contexts/themeContext";
 import { useDesign } from "../../../contexts/designContext";
 import { useTabsUi } from "../../../contexts/tabContext";
-import Header from "../../../components/a/header";
-import SectionHeader from "../../../components/shared/sectionHeader";
+import Header from "../../../components/c/header";
 import useApply from "../../../hooks/useApply";
-import { CalendarPlus, FileText } from "lucide-react-native";
+import LeaveUI from "../../../components/c/leaveUI";
+import ClaimUI from "../../../components/c/claimUI";
+import OvertimeUI from "../../../components/c/overtimeUI";
+import WorkUI from "../../../components/c/workUI";
+
+type ManageTab = "leave" | "claim" | "overtime" | "work";
 
 export default function Apply() {
   const { theme } = useAppTheme();
@@ -15,6 +18,7 @@ export default function Apply() {
   const { updateByOffset } = useTabsUi();
   const { balances, applications, submitLeave, initialForm } = useApply();
   const [form, setForm] = useState(initialForm);
+  const [activeTab, setActiveTab] = useState<ManageTab>("leave");
 
   return (
     <ScrollView
@@ -28,103 +32,19 @@ export default function Apply() {
       onScroll={(e) => updateByOffset(e.nativeEvent.contentOffset.y)}
       scrollEventThrottle={16}
     >
+      <Header activeTab={activeTab} onTabChange={setActiveTab} />
 
-      <SectionHeader
-        title="Apply Leave"
-        subtitle="Submit a new request"
-        icon={CalendarPlus}
-      />
+      {activeTab === "leave" && (
+        <>
+          <LeaveUI />
+        </>
+      )}
 
-      <View
-        style={{
-          padding: design.spacing.md,
-          borderRadius: design.radii.lg,
-          backgroundColor: theme.colors.surfaceVariant,
-          marginBottom: design.spacing.lg,
-        }}
-      >
-        {balances.map((item) => (
-          <View
-            key={item.type}
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginBottom: design.spacing.xs,
-            }}
-          >
-            <Text variant="bodyMedium" style={{ color: theme.colors.onBackground }}>
-              {item.label}
-            </Text>
-            <Text
-              variant="bodySmall"
-              style={{ color: theme.colors.onSurfaceVariant }}
-            >
-              {item.remaining} left
-            </Text>
-          </View>
-        ))}
-      </View>
+      {activeTab === "claim" && <ClaimUI />}
 
-      <Button
-        mode="contained"
-        onPress={async () => {
-          await submitLeave(form);
-        }}
-        style={{ marginBottom: design.spacing.xl }}
-      >
-        Submit Leave Request
-      </Button>
+      {activeTab === "overtime" && <OvertimeUI />}
 
-      <SectionHeader
-        title="My Applications"
-        subtitle="Leave history"
-        icon={FileText}
-      />
-
-      {applications.map((item) => (
-        <View
-          key={item.id}
-          style={{
-            padding: design.spacing.md,
-            borderRadius: design.radii.lg,
-            backgroundColor: theme.colors.surfaceVariant,
-            marginBottom: design.spacing.sm,
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <Text variant="bodyMedium" style={{ color: theme.colors.onBackground }}>
-              {item.type.toUpperCase()} · {item.days} day(s)
-            </Text>
-            <Text
-              variant="bodySmall"
-              style={{ color: theme.colors.onSurfaceVariant }}
-            >
-              {item.status}
-            </Text>
-          </View>
-
-          <Text
-            variant="bodySmall"
-            style={{ color: theme.colors.onSurfaceVariant, marginTop: 4 }}
-          >
-            {item.startDate} → {item.endDate}
-          </Text>
-
-          {item.reason && (
-            <Text
-              variant="bodySmall"
-              style={{ color: theme.colors.onSurfaceVariant, marginTop: 4 }}
-            >
-              Reason: {item.reason}
-            </Text>
-          )}
-        </View>
-      ))}
+      {activeTab === "work" && <WorkUI />}
     </ScrollView>
   );
 }
