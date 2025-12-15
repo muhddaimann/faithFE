@@ -1,26 +1,22 @@
 import React from "react";
-import { ScrollView } from "react-native";
+import { ScrollView, View } from "react-native";
+import { Text } from "react-native-paper";
 import { useRouter } from "expo-router";
+import { Clock, Calendar, CalendarCheck, Bell } from "lucide-react-native";
 import { useAppTheme } from "../../../contexts/themeContext";
 import { useDesign } from "../../../contexts/designContext";
 import { useTabsUi } from "../../../contexts/tabContext";
 import Header from "../../../components/a/header";
 import SectionHeader from "../../../components/shared/sectionHeader";
-import PromptUI from "../../../components/shared/promptUI";
-import HorizontalList from "../../../components/shared/horizontalList";
-import useDiscover from "../../../hooks/useDiscover";
+import useHome from "../../../hooks/useHome";
+import TodayUI from "../../../components/a/todayUI";
 
-export default function Discover() {
+export default function Home() {
   const { theme } = useAppTheme();
   const { design } = useDesign();
   const { updateByOffset } = useTabsUi();
-  const { sections } = useDiscover();
   const router = useRouter();
-
-  const cities = sections.find((s) => s.key === "cities");
-  const moods = sections.find((s) => s.key === "moods");
-  const nearby = sections.find((s) => s.key === "nearby");
-  const HORIZONTAL_OFFSET = design.spacing.md;
+  const { today, attendance, leave, announcements } = useHome();
 
   return (
     <ScrollView
@@ -35,58 +31,146 @@ export default function Discover() {
       scrollEventThrottle={16}
     >
       <Header />
+      <View
+        style={{
+          paddingBottom: design.spacing.lg,
+        }}
+      >
+        <TodayUI />
+      </View>
 
-      {cities && (
-        <>
-          <SectionHeader
-            title={cities.title}
-            subtitle={cities.subtitle}
-            icon={cities.icon}
-            onPress={() => router.push("/(tabs)/a/browseCity")}
-          />
+      <SectionHeader
+        title="Attendance"
+        subtitle="Your recent records"
+        icon={Calendar}
+        onPress={() => router.push("/(tabs)/b")}
+      />
 
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{
-              paddingHorizontal: HORIZONTAL_OFFSET,
-            }}
+      {attendance.length ? (
+        attendance.map((item) => (
+          <View
+            key={item.id}
             style={{
-              marginHorizontal: -HORIZONTAL_OFFSET,
+              padding: design.spacing.md,
+              borderRadius: design.radii.lg,
+              backgroundColor: theme.colors.surfaceVariant,
+              marginBottom: design.spacing.sm,
+              flexDirection: "row",
+              justifyContent: "space-between",
             }}
           >
-            <HorizontalList data={cities.items} />
-          </ScrollView>
-        </>
+            <Text
+              variant="bodyMedium"
+              style={{ color: theme.colors.onBackground }}
+            >
+              {item.date}
+            </Text>
+            <Text
+              variant="bodySmall"
+              style={{ color: theme.colors.onSurfaceVariant }}
+            >
+              {item.status}
+            </Text>
+          </View>
+        ))
+      ) : (
+        <View
+          style={{
+            padding: design.spacing.md,
+            borderRadius: design.radii.lg,
+            backgroundColor: theme.colors.surfaceVariant,
+            marginBottom: design.spacing.lg,
+          }}
+        >
+          <Text
+            variant="bodyMedium"
+            style={{ color: theme.colors.onSurfaceVariant }}
+          >
+            No recent attendance records.
+          </Text>
+        </View>
       )}
 
-      {moods && (
-        <>
-          <SectionHeader
-            title={moods.title}
-            subtitle={moods.subtitle}
-            icon={moods.icon}
-            onPress={() => router.push("/(tabs)/a/travelMood")}
-          />
-          <HorizontalList data={moods.items} />
-        </>
-      )}
+      <SectionHeader
+        title="Leave"
+        subtitle="Balance & requests"
+        icon={CalendarCheck}
+        onPress={() => router.push("/(tabs)/c")}
+      />
 
-      {nearby && (
-        <>
-          <SectionHeader
-            title={nearby.title}
-            subtitle={nearby.subtitle}
-            icon={nearby.icon}
-            onPress={() => router.push("/(tabs)/a/nearbySuggest")}
-          />
-          <PromptUI
-            title="Enable location access"
-            description="Get music suggestions based on where you are"
-            actionLabel="Allow"
-            onAction={() => {}}
-          />
-        </>
+      <View
+        style={{
+          padding: design.spacing.md,
+          borderRadius: design.radii.lg,
+          backgroundColor: theme.colors.surfaceVariant,
+          marginBottom: design.spacing.lg,
+        }}
+      >
+        <Text
+          variant="bodyMedium"
+          style={{ color: theme.colors.onSurfaceVariant }}
+        >
+          Leave balance: {leave.balance} days
+        </Text>
+        {leave.pending > 0 && (
+          <Text
+            variant="bodySmall"
+            style={{ color: theme.colors.onSurfaceVariant, marginTop: 4 }}
+          >
+            {leave.pending} request(s) pending approval
+          </Text>
+        )}
+      </View>
+
+      <SectionHeader
+        title="Announcements"
+        subtitle="Company updates"
+        icon={Bell}
+      />
+
+      {announcements.length ? (
+        announcements.map((item) => (
+          <View
+            key={item.id}
+            style={{
+              padding: design.spacing.md,
+              borderRadius: design.radii.lg,
+              backgroundColor: theme.colors.surfaceVariant,
+              marginBottom: design.spacing.sm,
+            }}
+          >
+            <Text
+              variant="bodyMedium"
+              style={{ color: theme.colors.onBackground }}
+            >
+              {item.title}
+            </Text>
+            <Text
+              variant="bodySmall"
+              style={{
+                color: theme.colors.onSurfaceVariant,
+                marginTop: 2,
+              }}
+            >
+              {item.summary}
+            </Text>
+          </View>
+        ))
+      ) : (
+        <View
+          style={{
+            padding: design.spacing.md,
+            borderRadius: design.radii.lg,
+            backgroundColor: theme.colors.surfaceVariant,
+          }}
+        >
+          <Text
+            variant="bodyMedium"
+            style={{ color: theme.colors.onSurfaceVariant }}
+          >
+            No new announcements.
+          </Text>
+        </View>
       )}
     </ScrollView>
   );

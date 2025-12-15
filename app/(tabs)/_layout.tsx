@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { Compass, PlayCircle, Map, Settings } from "lucide-react-native";
+import { LayoutGrid, Clock, Calendar, User } from "lucide-react-native";
 import { TabProvider } from "../../contexts/tabContext";
 import { CustomTabBar } from "../../components/shared/navBar";
 
@@ -13,35 +13,35 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="a"
           options={{
-            title: "Discover",
+            title: "Home",
             tabBarIcon: ({ color, size }) => (
-              <Compass color={color} size={size} />
+              <LayoutGrid color={color} size={size} />
             ),
           }}
         />
         <Tabs.Screen
           name="b"
           options={{
-            title: "Play",
+            title: "Attendance",
             tabBarIcon: ({ color, size }) => (
-              <PlayCircle color={color} size={size} />
+              <Clock color={color} size={size} />
             ),
           }}
         />
         <Tabs.Screen
           name="c"
           options={{
-            title: "Journey",
-            tabBarIcon: ({ color, size }) => <Map color={color} size={size} />,
+            title: "Apply",
+            tabBarIcon: ({ color, size }) => (
+              <Calendar color={color} size={size} />
+            ),
           }}
         />
         <Tabs.Screen
           name="d"
           options={{
-            title: "Settings",
-            tabBarIcon: ({ color, size }) => (
-              <Settings color={color} size={size} />
-            ),
+            title: "Profile",
+            tabBarIcon: ({ color, size }) => <User color={color} size={size} />,
           }}
         />
       </Tabs>

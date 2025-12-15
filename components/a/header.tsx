@@ -6,16 +6,23 @@ import { useDesign } from "../../contexts/designContext";
 
 type HeaderProps = {
   name?: string;
+  status?: "online" | "offline";
 };
 
-export default function Header({ name = "Traveler" }: HeaderProps) {
+export default function Header({
+  name = "Rockstar",
+  status = "online",
+}: HeaderProps) {
   const { theme } = useAppTheme();
   const { design } = useDesign();
+
+  const statusColor =
+    status === "online" ? theme.colors.tertiary : theme.colors.outlineVariant;
 
   return (
     <View
       style={{
-        paddingBottom: design.spacing.md,
+        paddingBottom: design.spacing.lg,
         backgroundColor: theme.colors.background,
         flexDirection: "row",
         alignItems: "center",
@@ -24,14 +31,14 @@ export default function Header({ name = "Traveler" }: HeaderProps) {
     >
       <View>
         <Text variant="labelMedium" style={{ color: theme.colors.primary }}>
-          TravelTune
+          FAITH
         </Text>
 
         <Text
           variant="headlineSmall"
           style={{ color: theme.colors.onBackground, marginTop: 2 }}
         >
-          Hello {name} 👋
+          Hello {name}
         </Text>
 
         <Text
@@ -41,16 +48,31 @@ export default function Header({ name = "Traveler" }: HeaderProps) {
             marginTop: 2,
           }}
         >
-          Ready for your next journey?
+          Here’s your work overview today
         </Text>
       </View>
 
-      <Avatar.Icon
-        size={40}
-        icon="account"
-        style={{ backgroundColor: theme.colors.surfaceVariant }}
-        color={theme.colors.onSurfaceVariant}
-      />
+      <View>
+        <Avatar.Icon
+          size={40}
+          icon="account"
+          style={{ backgroundColor: theme.colors.surfaceVariant }}
+          color={theme.colors.onSurfaceVariant}
+        />
+        <View
+          style={{
+            position: "absolute",
+            bottom: 2,
+            right: 2,
+            width: 10,
+            height: 10,
+            borderRadius: 5,
+            backgroundColor: statusColor,
+            borderWidth: 2,
+            borderColor: theme.colors.background,
+          }}
+        />
+      </View>
     </View>
   );
 }
