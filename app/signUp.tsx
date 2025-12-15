@@ -77,7 +77,6 @@ export default function SignUp() {
     if (!username || !pass || pass !== confirmPass) return;
 
     await signUp(username, pass);
-    // AuthGate will redirect after auth state updates
   };
 
   return (
@@ -141,7 +140,7 @@ export default function SignUp() {
                   maxWidth: 300,
                 }}
               >
-                Start your journey and let music guide every step.
+                Set up your account to access your work details.
               </Text>
             </View>
 

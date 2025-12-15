@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { ScrollView } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { ScrollView, Animated, Easing } from "react-native";
 import { Text } from "react-native-paper";
 import { useAppTheme } from "../contexts/themeContext";
 import { useDesign } from "../contexts/designContext";
@@ -9,15 +9,25 @@ export default function Goodbye() {
   const { theme } = useAppTheme();
   const { design } = useDesign();
 
+  const opacity = useRef(new Animated.Value(1)).current;
+
   useEffect(() => {
-    const timer = setTimeout(() => {
-      router.replace("/land");
-    }, 1500);
-    return () => clearTimeout(timer);
+    Animated.timing(opacity, {
+      toValue: 0,
+      duration: 400,
+      delay: 800,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start(() => {
+      router.replace("/");
+    });
   }, []);
 
   return (
     <ScrollView
+      bounces={false}
+      overScrollMode="never"
+      showsVerticalScrollIndicator={false}
       contentContainerStyle={{
         flexGrow: 1,
         alignItems: "center",
@@ -26,22 +36,25 @@ export default function Goodbye() {
         backgroundColor: theme.colors.background,
       }}
     >
-      <Text
-        variant="headlineMedium"
-        style={{ color: theme.colors.onBackground }}
-      >
-        See you next time 👋
-      </Text>
+      <Animated.View style={{ opacity }}>
+        <Text
+          variant="headlineMedium"
+          style={{ color: theme.colors.onBackground, textAlign: "center" }}
+        >
+          Signed out
+        </Text>
 
-      <Text
-        variant="bodyLarge"
-        style={{
-          marginTop: design.spacing.md,
-          color: theme.colors.onBackground,
-        }}
-      >
-        Safe travels.
-      </Text>
+        <Text
+          variant="bodyLarge"
+          style={{
+            marginTop: design.spacing.md,
+            color: theme.colors.onSurfaceVariant,
+            textAlign: "center",
+          }}
+        >
+          See you next time.
+        </Text>
+      </Animated.View>
     </ScrollView>
   );
 }

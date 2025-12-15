@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { ScrollView } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { ScrollView, Animated, Easing } from "react-native";
 import { Text } from "react-native-paper";
 import { useAppTheme } from "../contexts/themeContext";
 import { useDesign } from "../contexts/designContext";
@@ -9,12 +9,18 @@ export default function Welcome() {
   const { theme } = useAppTheme();
   const { design } = useDesign();
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      router.replace("/(tabs)/a");
-    }, 1200);
+  const opacity = useRef(new Animated.Value(1)).current;
 
-    return () => clearTimeout(timer);
+  useEffect(() => {
+    Animated.timing(opacity, {
+      toValue: 0,
+      duration: 400,
+      delay: 800,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start(() => {
+      router.replace("/(tabs)/a");
+    });
   }, []);
 
   return (
@@ -30,22 +36,25 @@ export default function Welcome() {
         backgroundColor: theme.colors.background,
       }}
     >
-      <Text
-        variant="headlineMedium"
-        style={{ color: theme.colors.onBackground }}
-      >
-        Welcome back!
-      </Text>
+      <Animated.View style={{ opacity }}>
+        <Text
+          variant="headlineMedium"
+          style={{ color: theme.colors.onBackground, textAlign: "center" }}
+        >
+          Welcome 👋
+        </Text>
 
-      <Text
-        variant="bodyLarge"
-        style={{
-          marginTop: design.spacing.md,
-          color: theme.colors.onBackground,
-        }}
-      >
-        Loading your journeys…
-      </Text>
+        <Text
+          variant="bodyLarge"
+          style={{
+            marginTop: design.spacing.md,
+            color: theme.colors.onSurfaceVariant,
+            textAlign: "center",
+          }}
+        >
+          We’re getting your workspace ready.
+        </Text>
+      </Animated.View>
     </ScrollView>
   );
 }

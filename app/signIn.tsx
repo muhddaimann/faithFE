@@ -145,7 +145,7 @@ export default function SignIn() {
                   maxWidth: 300,
                 }}
               >
-                Welcome back. Continue your journey with music.
+                Access your work details and stay on track.
               </Text>
             </View>
 
@@ -157,7 +157,6 @@ export default function SignIn() {
               autoCapitalize="none"
               returnKeyType="next"
               onSubmitEditing={() => passRef.current?.focus()}
-              blurOnSubmit={false}
             />
 
             <TextInput
@@ -176,18 +175,6 @@ export default function SignIn() {
                 {error}
               </Text>
             )}
-
-            <Pressable
-              onPress={() => alert("Password reset link sent")}
-              style={{ alignSelf: "flex-end" }}
-            >
-              <Text
-                variant="labelMedium"
-                style={{ color: theme.colors.primary }}
-              >
-                Forgot password?
-              </Text>
-            </Pressable>
 
             <Button
               mode="contained"

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { ScrollView, View, Animated, Easing } from "react-native";
 import { Text, Button } from "react-native-paper";
-import { Compass } from "lucide-react-native";
+import { LayoutGrid } from "lucide-react-native";
 import { router } from "expo-router";
 import { useAppTheme } from "../contexts/themeContext";
 import { useDesign } from "../contexts/designContext";
@@ -74,36 +74,54 @@ export default function Land() {
             elevation: 8,
           }}
         >
-          <Compass size={30} color={theme.colors.onPrimaryContainer} />
+          <LayoutGrid size={36} color={theme.colors.onPrimaryContainer} />
         </View>
 
         <Text
           variant="headlineLarge"
-          style={{ color: theme.colors.onBackground, textAlign: "center" }}
+          style={{
+            color: theme.colors.onBackground,
+            textAlign: "center",
+            fontWeight: "700",
+            letterSpacing: -0.5,
+          }}
         >
-          Welcome to TravelTune
+          Hello Rockstar
         </Text>
 
         <Text
-          variant="bodyLarge"
+          variant="titleMedium"
           style={{
             color: theme.colors.onSurfaceVariant,
             textAlign: "center",
-            maxWidth: 300,
+            maxWidth: 280,
+            marginTop: design.spacing.xs,
             marginBottom: design.spacing.xl,
           }}
         >
-          Your soundtrack for every journey.
+          Sign in to continue managing your work details.
         </Text>
 
         <View style={{ width: "100%", gap: design.spacing.md }}>
-          <Button mode="contained" onPress={() => router.push("/signUp")}>
-            Create Account
-          </Button>
-
-          <Button mode="outlined" onPress={() => router.push("/signIn")}>
+          <Button mode="contained" onPress={() => router.push("/signIn")}>
             Sign In
           </Button>
+
+          <Text
+            variant="bodyMedium"
+            style={{
+              color: theme.colors.onSurfaceVariant,
+              textAlign: "center",
+            }}
+          >
+            New here?{" "}
+            <Text
+              style={{ color: theme.colors.primary }}
+              onPress={() => router.push("/signUp")}
+            >
+              Get started
+            </Text>
+          </Text>
         </View>
       </Animated.View>
     </ScrollView>
