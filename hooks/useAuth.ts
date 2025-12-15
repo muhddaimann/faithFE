@@ -1,15 +1,8 @@
 import { useAuthContext } from "../contexts/authContext";
 
 export default function useAuth() {
-  const {
-    user,
-    isAuthenticated,
-    isReady,
-    signIn,
-    signUp,
-    forgotPassword,
-    logout,
-  } = useAuthContext();
+  const { user, isAuthenticated, isReady, signIn, signUp, logout } =
+    useAuthContext();
 
   return {
     user,
@@ -17,7 +10,6 @@ export default function useAuth() {
     isReady,
     signIn,
     signUp,
-    forgotPassword,
     logout,
   };
 }

@@ -14,7 +14,6 @@ type AuthState = {
   isReady: boolean;
   signIn: (username: string, password: string) => Promise<boolean>;
   signUp: (username: string, password: string) => Promise<boolean>;
-  forgotPassword: (username: string) => void;
   logout: () => Promise<void>;
 };
 
@@ -24,7 +23,6 @@ const AuthContext = createContext<AuthState>({
   isReady: false,
   signIn: async () => false,
   signUp: async () => false,
-  forgotPassword: () => {},
   logout: async () => {},
 });
 
@@ -75,16 +73,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return true;
   };
 
-  const forgotPassword = (username: string) => {
-    Alert.alert(
-      "Reset password",
-      `If an account exists for "${
-        username || "this user"
-      }", a reset link will be sent.`,
-      [{ text: "OK" }]
-    );
-  };
-
   const logout = async () => {
     Alert.alert("Log out", "Are you sure you want to log out of TravelTune?", [
       {
@@ -111,7 +99,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isReady,
         signIn,
         signUp,
-        forgotPassword,
         logout,
       }}
     >

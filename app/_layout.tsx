@@ -17,43 +17,26 @@ import { ThemeProvider, useAppTheme } from "../contexts/themeContext";
 import { DesignProvider } from "../contexts/designContext";
 import { TokenProvider } from "../contexts/tokenContext";
 import { AuthProvider, useAuthContext } from "../contexts/authContext";
-import { AppProvider, useApp } from "../contexts/appContext";
 
 function AuthGate() {
-  const { isReady: appReady, isFirstLaunch } = useApp();
   const { isReady: authReady, isAuthenticated } = useAuthContext();
   const pathname = usePathname();
-
   const hasRedirected = useRef(false);
 
   useEffect(() => {
-    if (!appReady || !authReady) return;
-    if (hasRedirected.current) return;
+    if (!authReady || hasRedirected.current) return;
 
-    if (isFirstLaunch && pathname !== "/") {
+    if (!isAuthenticated && !["/", "/signIn", "/signUp"].includes(pathname)) {
       hasRedirected.current = true;
       router.replace("/");
       return;
     }
 
-    if (
-      !isAuthenticated &&
-      !["/land", "/signIn", "/signUp", "/forgot"].includes(pathname)
-    ) {
-      hasRedirected.current = true;
-      router.replace("/land");
-      return;
-    }
-
-    if (
-      isAuthenticated &&
-      ["/", "/land", "/signIn", "/signUp"].includes(pathname)
-    ) {
+    if (isAuthenticated && ["/", "/signIn", "/signUp"].includes(pathname)) {
       hasRedirected.current = true;
       router.replace("/welcome");
-      return;
     }
-  }, [appReady, authReady, isFirstLaunch, isAuthenticated, pathname]);
+  }, [authReady, isAuthenticated, pathname]);
 
   return null;
 }
@@ -67,7 +50,6 @@ function Providers() {
         style={theme.dark ? "light" : "dark"}
         backgroundColor={theme.colors.background}
       />
-
       <SafeAreaView
         edges={["top"]}
         style={{ flex: 1, backgroundColor: theme.colors.background }}
@@ -92,17 +74,15 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <AppProvider>
-        <TokenProvider>
-          <AuthProvider>
-            <ThemeProvider>
-              <DesignProvider>
-                <Providers />
-              </DesignProvider>
-            </ThemeProvider>
-          </AuthProvider>
-        </TokenProvider>
-      </AppProvider>
+      <TokenProvider>
+        <AuthProvider>
+          <ThemeProvider>
+            <DesignProvider>
+              <Providers />
+            </DesignProvider>
+          </ThemeProvider>
+        </AuthProvider>
+      </TokenProvider>
     </SafeAreaProvider>
   );
 }

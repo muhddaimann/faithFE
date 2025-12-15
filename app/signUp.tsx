@@ -15,23 +15,18 @@ import { useAppTheme } from "../contexts/themeContext";
 import { useDesign } from "../contexts/designContext";
 import AppHeader from "../components/shared/header";
 import useAuth from "../hooks/useAuth";
-import { useApp } from "../contexts/appContext";
 
 export default function SignUp() {
   const { theme } = useAppTheme();
   const { design } = useDesign();
   const { signUp } = useAuth();
-  const { markLaunched } = useApp();
-
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [confirmPass, setConfirmPass] = useState("");
-
   const emailRef = useRef<any>(null);
   const passRef = useRef<any>(null);
   const confirmRef = useRef<any>(null);
-
   const enterOpacity = useRef(new Animated.Value(0)).current;
   const enterY = useRef(new Animated.Value(16)).current;
   const liftY = useRef(new Animated.Value(0)).current;
@@ -81,10 +76,8 @@ export default function SignUp() {
   const onSubmit = async () => {
     if (!username || !pass || pass !== confirmPass) return;
 
-    const ok = await signUp(username, pass);
-    if (ok) {
-      await markLaunched();
-    }
+    await signUp(username, pass);
+    // AuthGate will redirect after auth state updates
   };
 
   return (

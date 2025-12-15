@@ -1,9 +1,9 @@
 {
   "expo": {
-    "name": "traveltune",
-    "slug": "traveltune",
+    "name": "faith",
+    "slug": "faith",
     "version": "1.0.0",
-    "scheme": "traveltune",
+    "scheme": "faith",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",

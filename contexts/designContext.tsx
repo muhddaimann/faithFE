@@ -6,7 +6,7 @@ type DesignContextType = {
 };
 
 const DesignContext = createContext<DesignContextType>({
-  design: design, // Default value
+  design: design,
 });
 
 export const DesignProvider = ({ children }: { children: React.ReactNode }) => {
