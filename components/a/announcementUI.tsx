@@ -1,30 +1,25 @@
-import React, { useState } from "react";
-import { View } from "react-native";
-import { Text, Button, Card } from "react-native-paper";
-import { Bell, ChevronDown, ChevronUp } from "lucide-react-native";
+import React from "react";
+import { View, Pressable } from "react-native";
+import { Text, Card } from "react-native-paper";
+import { Bell, Check } from "lucide-react-native";
 import { useAppTheme } from "../../contexts/themeContext";
 import { useDesign } from "../../contexts/designContext";
 import NoDataUI from "../shared/nodataUI";
-
-export type AnnouncementItem = {
-  id: string;
-  title: string;
-  summary: string;
-  date?: string;
-};
+import useAnnouncement, { AnnouncementItem } from "../../hooks/useAnnouncement";
 
 type AnnouncementUIProps = {
-  items: AnnouncementItem[];
+  items?: AnnouncementItem[];
 };
 
 export default function AnnouncementUI({ items }: AnnouncementUIProps) {
   const { theme } = useAppTheme();
   const { design } = useDesign();
 
-  const [expanded, setExpanded] = useState(false);
-  const displayItems = expanded ? items : items.slice(0, 3);
+  const { announcements, markAllAsRead } = useAnnouncement();
 
-  if (items.length === 0) {
+  const data = (items ?? announcements).slice(0, 3);
+
+  if (data.length === 0) {
     return (
       <NoDataUI
         title="No announcements"
@@ -35,15 +30,16 @@ export default function AnnouncementUI({ items }: AnnouncementUIProps) {
 
   return (
     <View style={{ gap: design.spacing.sm }}>
-      {displayItems.map((item) => (
+      {data.map((item) => (
         <Card
           key={item.id}
           style={{
             backgroundColor: theme.colors.surface,
             borderRadius: design.radii.lg,
+            opacity: item.read ? 0.6 : 1,
           }}
         >
-          <View style={{ padding: design.spacing.md, gap: 6 }}>
+          <View style={{ padding: design.spacing.md, gap: design.spacing.xs }}>
             <View
               style={{
                 flexDirection: "row",
@@ -54,10 +50,7 @@ export default function AnnouncementUI({ items }: AnnouncementUIProps) {
             >
               <Text
                 variant="bodyMedium"
-                style={{
-                  color: theme.colors.onSurface,
-                  flex: 1,
-                }}
+                style={{ color: theme.colors.onSurface, flex: 1 }}
               >
                 {item.title}
               </Text>
@@ -95,22 +88,26 @@ export default function AnnouncementUI({ items }: AnnouncementUIProps) {
         </Card>
       ))}
 
-      {items.length > 3 && (
-        <Button
-          mode="contained"
-          icon={() =>
-            expanded ? (
-              <ChevronUp size={16} color={theme.colors.onPrimary} />
-            ) : (
-              <ChevronDown size={16} color={theme.colors.onPrimary} />
-            )
-          }
-          onPress={() => setExpanded(!expanded)}
-          style={{ width: "100%", marginTop: design.spacing.xs }}
+      <Pressable
+        onPress={markAllAsRead}
+        style={{
+          paddingVertical: design.spacing.sm,
+          borderRadius: design.radii.lg,
+          backgroundColor: theme.colors.secondaryContainer,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: design.spacing.xs,
+        }}
+      >
+        <Check size={16} color={theme.colors.onSecondaryContainer} />
+        <Text
+          variant="labelMedium"
+          style={{ color: theme.colors.onSecondaryContainer }}
         >
-          {expanded ? "Show less" : "See more"}
-        </Button>
-      )}
+          Mark all as read
+        </Text>
+      </Pressable>
     </View>
   );
 }

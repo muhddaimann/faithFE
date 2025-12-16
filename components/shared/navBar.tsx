@@ -4,6 +4,7 @@ import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme, Text } from "react-native-paper";
 import { useTabsUi } from "../../contexts/tabContext";
+import { useDesign } from "../../contexts/designContext";
 
 export function CustomTabBar({
   state,
@@ -11,6 +12,7 @@ export function CustomTabBar({
   navigation,
 }: BottomTabBarProps) {
   const { colors } = useTheme();
+  const { design } = useDesign();
   const insets = useSafeAreaInsets();
   const { opacity, scale, mode } = useTabsUi();
 
@@ -20,23 +22,23 @@ export function CustomTabBar({
     <View
       style={{
         position: "absolute",
-        bottom: insets.bottom + 10,
-        left: 16,
-        right: 16,
-        paddingVertical: 12,
-        paddingHorizontal: 20,
-        borderRadius: 32,
+        bottom: insets.bottom + design.spacing.sm,
+        left: design.spacing.lg,
+        right: design.spacing.lg,
+        paddingVertical: design.spacing.sm,
+        paddingHorizontal: design.spacing.lg,
+        borderRadius: design.radii.pill,
         backgroundColor: colors.surface,
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
         opacity,
         transform: [{ scale }],
-        elevation: 6,
+        elevation: design.elevation.level3,
         shadowColor: colors.shadow,
         shadowOpacity: 0.12,
-        shadowRadius: 6,
-        shadowOffset: { width: 0, height: 3 },
+        shadowRadius: design.spacing.sm,
+        shadowOffset: { width: 0, height: design.spacing.xxs },
       }}
       pointerEvents={opacity === 0 ? "none" : "auto"}
     >
@@ -57,9 +59,7 @@ export function CustomTabBar({
             : route.name;
 
         const onPress = () => {
-          if (!isFocused) {
-            navigation.navigate(route.name);
-          }
+          if (!isFocused) navigation.navigate(route.name);
         };
 
         return (
@@ -69,13 +69,15 @@ export function CustomTabBar({
             activeOpacity={0.8}
             style={{
               flex: 1,
+              minHeight: design.sizes.touch.minHeight,
               alignItems: "center",
               justifyContent: "center",
+              gap: design.spacing.xxs,
             }}
           >
             {Icon && (
               <Icon
-                size={22}
+                size={design.sizes.icon.md}
                 color={isFocused ? colors.primary : colors.onSurfaceVariant}
               />
             )}
@@ -83,7 +85,6 @@ export function CustomTabBar({
             <Text
               variant="labelSmall"
               style={{
-                marginTop: 4,
                 color: isFocused ? colors.primary : colors.onSurfaceVariant,
               }}
             >

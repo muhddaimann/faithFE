@@ -39,6 +39,7 @@ export default function Home() {
       contentContainerStyle={{
         padding: design.spacing.md,
         paddingBottom: design.spacing["2xl"] * 4,
+        gap: design.spacing.lg,
       }}
       onScroll={(e) => updateByOffset(e.nativeEvent.contentOffset.y)}
       scrollEventThrottle={16}
@@ -57,7 +58,7 @@ export default function Home() {
 
       <SectionHeader
         title="Leave"
-        subtitle="Balance & Application"
+        subtitle="Balance & application"
         icon={CalendarCheck}
         onPress={() => router.push("/(tabs)/c")}
       />
@@ -67,8 +68,9 @@ export default function Home() {
         title="Announcements"
         subtitle="Company updates"
         icon={Bell}
+        onPress={() => router.push("/(tabs)/a/announcement")}
       />
-      <AnnouncementUI items={announcements} />
+      <AnnouncementUI />
     </ScrollView>
   );
 }
