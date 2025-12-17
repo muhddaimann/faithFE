@@ -1,19 +1,101 @@
 import React from "react";
-import { ScrollView, View } from "react-native";
-import { Text, Button } from "react-native-paper";
-import { useAppTheme } from "../../../contexts/themeContext";
+import { ScrollView, View, Pressable } from "react-native";
+import { Text, useTheme, Divider } from "react-native-paper";
+import {
+  ChevronRight,
+  User,
+  Bell,
+  Clock,
+  CalendarDays,
+  Wallet,
+  HelpCircle,
+  Info,
+  LogOut,
+} from "lucide-react-native";
 import { useDesign } from "../../../contexts/designContext";
 import { useTabsUi } from "../../../contexts/tabContext";
-import Header from "../../../components/a/header";
-import SectionHeader from "../../../components/shared/sectionHeader";
-import useProfile from "../../../hooks/useProfile";
-import { User, FileText, Settings } from "lucide-react-native";
+import Header from "../../../components/d/header";
+import useAuth from "../../../hooks/useAuth";
 
-export default function Profile() {
-  const { theme } = useAppTheme();
+export default function Settings() {
+  const theme = useTheme();
   const { design } = useDesign();
   const { updateByOffset } = useTabsUi();
-  const { profile, payslips, documents, preferences } = useProfile();
+  const { logout } = useAuth();
+
+  const Item = ({
+    title,
+    subtitle,
+    icon: Icon,
+    danger,
+    onPress,
+  }: {
+    title: string;
+    subtitle?: string;
+    icon?: React.ComponentType<{ size?: number; color?: string }>;
+    danger?: boolean;
+    onPress?: () => void;
+  }) => (
+    <Pressable
+      onPress={onPress}
+      disabled={!onPress}
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        paddingVertical: design.spacing.md,
+        paddingHorizontal: design.spacing.md,
+        gap: design.spacing.md,
+        opacity: onPress ? 1 : 0.9,
+      }}
+    >
+      {Icon && (
+        <View
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: 18,
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: danger
+              ? theme.colors.errorContainer
+              : theme.colors.surfaceVariant,
+          }}
+        >
+          <Icon
+            size={18}
+            color={
+              danger
+                ? theme.colors.onErrorContainer
+                : theme.colors.onSurfaceVariant
+            }
+          />
+        </View>
+      )}
+
+      <View style={{ flex: 1 }}>
+        <Text
+          variant="bodyLarge"
+          style={{
+            color: danger ? theme.colors.error : theme.colors.onSurface,
+          }}
+        >
+          {title}
+        </Text>
+        {subtitle && (
+          <Text
+            variant="bodySmall"
+            style={{ color: theme.colors.onSurfaceVariant }}
+          >
+            {subtitle}
+          </Text>
+        )}
+      </View>
+
+      {!danger && (
+        <ChevronRight size={18} color={theme.colors.onSurfaceVariant} />
+      )}
+    </Pressable>
+  );
 
   return (
     <ScrollView
@@ -21,150 +103,61 @@ export default function Profile() {
       showsVerticalScrollIndicator={false}
       style={{ flex: 1, backgroundColor: theme.colors.background }}
       contentContainerStyle={{
-        padding: design.spacing.md,
         paddingBottom: design.spacing["2xl"] * 3,
       }}
       onScroll={(e) => updateByOffset(e.nativeEvent.contentOffset.y)}
       scrollEventThrottle={16}
     >
-      <SectionHeader
-        title="My Profile"
-        subtitle="Personal information"
-        icon={User}
-      />
+      <Header />
 
       <View
         style={{
-          padding: design.spacing.md,
-          borderRadius: design.radii.lg,
-          backgroundColor: theme.colors.surfaceVariant,
-          marginBottom: design.spacing.lg,
+          marginHorizontal: design.spacing.md,
+          borderRadius: design.radii.xl,
+          backgroundColor: theme.colors.surface,
+          overflow: "hidden",
         }}
       >
-        <Text variant="bodyMedium" style={{ color: theme.colors.onBackground }}>
-          {profile.name}
-        </Text>
-        <Text
-          variant="bodySmall"
-          style={{ color: theme.colors.onSurfaceVariant }}
-        >
-          {profile.role} · {profile.department}
-        </Text>
-        <Text
-          variant="bodySmall"
-          style={{ color: theme.colors.onSurfaceVariant, marginTop: 4 }}
-        >
-          {profile.email}
-        </Text>
-        <Text
-          variant="bodySmall"
-          style={{ color: theme.colors.onSurfaceVariant, marginTop: 4 }}
-        >
-          Employee ID: {profile.employeeId}
-        </Text>
-        <Text
-          variant="bodySmall"
-          style={{ color: theme.colors.onSurfaceVariant, marginTop: 4 }}
-        >
-          Joined: {profile.joinDate}
-        </Text>
+        <Item title="Profile" subtitle="Personal information" icon={User} />
+        <Divider />
+        <Item
+          title="Notifications"
+          subtitle="Email & push alerts"
+          icon={Bell}
+        />
+        <Divider />
+        <Item
+          title="Attendance Settings"
+          subtitle="Check-in rules"
+          icon={Clock}
+        />
+        <Divider />
+        <Item
+          title="Leave Preferences"
+          subtitle="Leave & entitlement"
+          icon={CalendarDays}
+        />
+        <Divider />
+        <Item
+          title="Payroll Information"
+          subtitle="Salary & bank details"
+          icon={Wallet}
+        />
+        <Divider />
+        <Item title="Help & Support" icon={HelpCircle} />
+        <Divider />
+        <Item title="About HRMS" subtitle="Version & legal" icon={Info} />
       </View>
 
-      <SectionHeader
-        title="Payslips"
-        subtitle="Salary records"
-        icon={FileText}
-      />
-
-      {payslips.map((item) => (
-        <View
-          key={item.id}
-          style={{
-            padding: design.spacing.md,
-            borderRadius: design.radii.lg,
-            backgroundColor: theme.colors.surfaceVariant,
-            marginBottom: design.spacing.sm,
-          }}
-        >
-          <Text
-            variant="bodyMedium"
-            style={{ color: theme.colors.onBackground }}
-          >
-            {item.month}
-          </Text>
-          <Text
-            variant="bodySmall"
-            style={{ color: theme.colors.onSurfaceVariant }}
-          >
-            Net Pay: {item.netPay}
-          </Text>
-        </View>
-      ))}
-
-      <SectionHeader
-        title="Documents"
-        subtitle="Company files"
-        icon={FileText}
-      />
-
-      {documents.map((item) => (
-        <View
-          key={item.id}
-          style={{
-            padding: design.spacing.md,
-            borderRadius: design.radii.lg,
-            backgroundColor: theme.colors.surfaceVariant,
-            marginBottom: design.spacing.sm,
-          }}
-        >
-          <Text
-            variant="bodyMedium"
-            style={{ color: theme.colors.onBackground }}
-          >
-            {item.title}
-          </Text>
-          <Text
-            variant="bodySmall"
-            style={{ color: theme.colors.onSurfaceVariant }}
-          >
-            {item.date}
-          </Text>
-        </View>
-      ))}
-
-      <SectionHeader
-        title="Preferences"
-        subtitle="App settings"
-        icon={Settings}
-      />
-
       <View
         style={{
-          padding: design.spacing.md,
-          borderRadius: design.radii.lg,
-          backgroundColor: theme.colors.surfaceVariant,
+          margin: design.spacing.md,
+          borderRadius: design.radii.xl,
+          backgroundColor: theme.colors.surface,
+          overflow: "hidden",
         }}
       >
-        <Text
-          variant="bodySmall"
-          style={{ color: theme.colors.onSurfaceVariant }}
-        >
-          Dark mode: {preferences.darkMode ? "Enabled" : "Disabled"}
-        </Text>
-        <Text
-          variant="bodySmall"
-          style={{ color: theme.colors.onSurfaceVariant, marginTop: 4 }}
-        >
-          Notifications: {preferences.notifications ? "Enabled" : "Disabled"}
-        </Text>
-
-        <Button
-          mode="contained"
-          style={{ marginTop: design.spacing.md }}
-          onPress={() => {}}
-        >
-          Edit Preferences
-        </Button>
+        <Item title="Log Out" icon={LogOut} danger onPress={logout} />
       </View>
     </ScrollView>
   );

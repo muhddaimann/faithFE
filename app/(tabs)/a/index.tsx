@@ -39,7 +39,6 @@ export default function Home() {
       contentContainerStyle={{
         padding: design.spacing.md,
         paddingBottom: design.spacing["2xl"] * 4,
-        gap: design.spacing.lg,
       }}
       onScroll={(e) => updateByOffset(e.nativeEvent.contentOffset.y)}
       scrollEventThrottle={16}

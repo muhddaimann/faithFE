@@ -16,7 +16,6 @@ type HeaderProps = {
 export default function Header({ activeTab, onTabChange }: HeaderProps) {
   const { theme } = useAppTheme();
   const { design } = useDesign();
-
   const status: UserStatus = "online";
   const statusColor =
     status === "online" ? theme.colors.tertiary : theme.colors.outlineVariant;
