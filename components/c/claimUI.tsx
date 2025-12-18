@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { View, Pressable } from "react-native";
-import { Text, Button } from "react-native-paper";
+import { View } from "react-native";
+import { Text, Button, useTheme } from "react-native-paper";
 import {
   Receipt,
   Clock,
@@ -9,14 +9,14 @@ import {
   ChevronUp,
   Menu,
 } from "lucide-react-native";
-import { useAppTheme } from "../../contexts/themeContext";
+import { router } from "expo-router";
 import { useDesign } from "../../contexts/designContext";
 import SectionHeader from "../shared/sectionHeader";
 import NoDataUI from "../shared/nodataUI";
 import useClaim from "../../hooks/useClaim";
 
 export default function ClaimUI() {
-  const { theme } = useAppTheme();
+  const { colors } = useTheme();
   const { design } = useDesign();
 
   const { balances, claims, initialForm, submitClaim, toggleMock } = useClaim();
@@ -25,98 +25,88 @@ export default function ClaimUI() {
   const [form, setForm] = useState(initialForm);
 
   const primaryBalance = balances[0];
-  const pendingCount = claims.filter((c) => c.status === "pending").length;
+  const claimBalance = primaryBalance?.remaining ?? 0;
+  const pendingClaims = claims.filter((c) => c.status === "pending").length;
 
   const displayClaims = expanded ? claims : claims.slice(0, 3);
 
   return (
     <View>
-      <View style={{ flexDirection: "row", gap: design.spacing.md }}>
-        <View
-          style={{
-            flex: 1,
-            padding: design.spacing.lg,
-            borderRadius: design.radii.xl,
-            backgroundColor: theme.colors.primaryContainer,
-            justifyContent: "space-between",
-            minHeight: 140,
-          }}
-        >
-          <Receipt
-            size={32}
-            color={theme.colors.onPrimaryContainer}
-            style={{ alignSelf: "flex-end" }}
-          />
-
-          <View>
-            <Text
-              variant="displaySmall"
-              style={{ color: theme.colors.onPrimaryContainer }}
-            >
-              RM {primaryBalance?.remaining ?? 0}
-            </Text>
-            <Text
-              variant="labelMedium"
-              style={{ color: theme.colors.onSurfaceVariant }}
-            >
-              Claim balance remaining
-            </Text>
-          </View>
-        </View>
-
-        <View style={{ flex: 1, gap: design.spacing.md }}>
+      <View style={{ gap: design.spacing.sm }}>
+        <View style={{ flexDirection: "row", gap: design.spacing.md }}>
           <View
             style={{
-              flex: 1,
+              flex: 1.2,
               padding: design.spacing.md,
-              borderRadius: design.radii.lg,
-              backgroundColor: theme.colors.secondaryContainer,
+              borderRadius: design.radii.xl,
+              backgroundColor: colors.primaryContainer,
               justifyContent: "space-between",
+              minHeight: 160,
             }}
           >
-            <Clock
-              size={24}
-              color={theme.colors.onSecondaryContainer}
+            <Receipt
+              size={32}
+              color={colors.onPrimaryContainer}
               style={{ alignSelf: "flex-end" }}
             />
 
             <View>
               <Text
                 variant="headlineLarge"
-                style={{ color: theme.colors.onSecondaryContainer }}
+                style={{ color: colors.onPrimaryContainer }}
               >
-                {pendingCount}
+                {claimBalance}
               </Text>
               <Text
-                variant="labelSmall"
-                style={{ color: theme.colors.onSurfaceVariant }}
+                variant="labelMedium"
+                style={{ color: colors.onSurfaceVariant }}
               >
-                Pending claims
+                Claim balance
               </Text>
             </View>
           </View>
 
-          <Pressable
-            onPress={() => submitClaim(form)}
+          <View
             style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: design.spacing.xs,
-              paddingVertical: design.spacing.md,
+              flex: 1,
+              padding: design.spacing.md,
               borderRadius: design.radii.lg,
-              backgroundColor: theme.colors.primary,
+              backgroundColor: colors.secondaryContainer,
+              justifyContent: "space-between",
             }}
           >
-            <Plus size={18} color={theme.colors.onPrimary} />
-            <Text
-              variant="labelLarge"
-              style={{ color: theme.colors.onPrimary }}
-            >
-              Submit claim
-            </Text>
-          </Pressable>
+            <Clock
+              size={24}
+              color={colors.onSecondaryContainer}
+              style={{ alignSelf: "flex-end" }}
+            />
+
+            <View>
+              <Text
+                variant="headlineLarge"
+                style={{ color: colors.onSecondaryContainer }}
+              >
+                {pendingClaims}
+              </Text>
+              <Text
+                variant="labelSmall"
+                style={{ color: colors.onSurfaceVariant }}
+              >
+                Pending
+              </Text>
+            </View>
+          </View>
         </View>
+
+        <Button
+          mode="contained"
+          onPress={() => router.push("/(tabs)/c/claimForm")}
+          icon={({ size, color }) => <Plus size={size} color={color} />}
+          contentStyle={{ gap: design.spacing.xs }}
+          style={{ width: "100%" }}
+        >
+          Submit claim
+        </Button>
       </View>
 
       <View style={{ paddingVertical: design.spacing.md }}>
@@ -132,10 +122,10 @@ export default function ClaimUI() {
                 borderRadius: 18,
                 alignItems: "center",
                 justifyContent: "center",
-                backgroundColor: theme.colors.surfaceVariant,
+                backgroundColor: colors.surfaceVariant,
               }}
             >
-              <Menu size={18} color={theme.colors.onSurfaceVariant} />
+              <Menu size={18} color={colors.onSurfaceVariant} />
             </View>
           }
         />
@@ -153,24 +143,21 @@ export default function ClaimUI() {
                 style={{
                   padding: design.spacing.md,
                   borderRadius: design.radii.lg,
-                  backgroundColor: theme.colors.surface,
+                  backgroundColor: colors.surface,
                 }}
               >
-                <Text
-                  variant="bodyMedium"
-                  style={{ color: theme.colors.onSurface }}
-                >
+                <Text variant="bodyMedium" style={{ color: colors.onSurface }}>
                   {item.title}
                 </Text>
                 <Text
                   variant="bodySmall"
-                  style={{ color: theme.colors.onSurfaceVariant }}
+                  style={{ color: colors.onSurfaceVariant }}
                 >
                   {item.date} · RM {item.amount}
                 </Text>
                 <Text
                   variant="labelSmall"
-                  style={{ color: theme.colors.primary, marginTop: 4 }}
+                  style={{ color: colors.primary, marginTop: 4 }}
                 >
                   {item.status}
                 </Text>

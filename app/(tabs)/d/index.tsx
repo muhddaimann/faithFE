@@ -144,8 +144,6 @@ export default function Settings() {
           icon={Wallet}
         />
         <Divider />
-        <Item title="Help & Support" icon={HelpCircle} />
-        <Divider />
         <Item title="About HRMS" subtitle="Version & legal" icon={Info} />
       </View>
 

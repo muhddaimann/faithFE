@@ -18,7 +18,7 @@ export default function Home() {
   const { design } = useDesign();
   const { updateByOffset } = useTabsUi();
   const router = useRouter();
-  const { attendance, leave, announcements } = useHome();
+  const { attendance, leave } = useHome();
 
   const attendanceRecords = attendance.map((item) => ({
     id: item.id,
@@ -48,16 +48,8 @@ export default function Home() {
       <TodayUI />
 
       <SectionHeader
-        title="Attendance"
-        subtitle="Your recent records"
-        icon={Calendar}
-        onPress={() => router.push("/(tabs)/b")}
-      />
-      <AttendanceUI records={attendanceRecords} />
-
-      <SectionHeader
         title="Leave"
-        subtitle="Balance & application"
+        subtitle="Balance & other applications"
         icon={CalendarCheck}
         onPress={() => router.push("/(tabs)/c")}
       />

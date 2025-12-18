@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { View, Pressable } from "react-native";
-import { Text, Button } from "react-native-paper";
+import { View } from "react-native";
+import { Text, Button, useTheme } from "react-native-paper";
 import {
   Timer,
   Clock,
@@ -8,115 +8,105 @@ import {
   ChevronDown,
   ChevronUp,
   Menu,
+  Calendar,
 } from "lucide-react-native";
-import { useAppTheme } from "../../contexts/themeContext";
+import { router } from "expo-router";
 import { useDesign } from "../../contexts/designContext";
 import SectionHeader from "../shared/sectionHeader";
 import NoDataUI from "../shared/nodataUI";
 import useOvertime from "../../hooks/useOvertime";
 
 export default function OvertimeUI() {
-  const { theme } = useAppTheme();
+  const { colors } = useTheme();
   const { design } = useDesign();
-
   const { summary, records, initialForm, submitOvertime, toggleMock } =
     useOvertime();
 
   const [expanded, setExpanded] = useState(false);
   const [form, setForm] = useState(initialForm);
 
-  const pendingCount = records.filter((r) => r.status === "pending").length;
+  const totalOT = summary?.totalHours ?? 0;
+  const pendingOT = records.filter((r) => r.status === "pending").length;
 
   const displayRecords = expanded ? records : records.slice(0, 3);
 
   return (
     <View>
-      <View style={{ flexDirection: "row", gap: design.spacing.md }}>
-        <View
-          style={{
-            flex: 1,
-            padding: design.spacing.lg,
-            borderRadius: design.radii.xl,
-            backgroundColor: theme.colors.primaryContainer,
-            justifyContent: "space-between",
-            minHeight: 140,
-          }}
-        >
-          <Timer
-            size={32}
-            color={theme.colors.onPrimaryContainer}
-            style={{ alignSelf: "flex-end" }}
-          />
-
-          <View>
-            <Text
-              variant="displaySmall"
-              style={{ color: theme.colors.onPrimaryContainer }}
-            >
-              {summary.totalHours}
-            </Text>
-            <Text
-              variant="labelMedium"
-              style={{ color: theme.colors.onSurfaceVariant }}
-            >
-              Total overtime hours
-            </Text>
-          </View>
-        </View>
-
-        <View style={{ flex: 1, gap: design.spacing.md }}>
+      <View style={{ gap: design.spacing.sm }}>
+        <View style={{ flexDirection: "row", gap: design.spacing.md }}>
           <View
             style={{
-              flex: 1,
+              flex: 1.2,
               padding: design.spacing.md,
-              borderRadius: design.radii.lg,
-              backgroundColor: theme.colors.secondaryContainer,
+              borderRadius: design.radii.xl,
+              backgroundColor: colors.primaryContainer,
               justifyContent: "space-between",
+              minHeight: 160,
             }}
           >
             <Clock
-              size={24}
-              color={theme.colors.onSecondaryContainer}
+              size={32}
+              color={colors.onPrimaryContainer}
               style={{ alignSelf: "flex-end" }}
             />
 
             <View>
               <Text
                 variant="headlineLarge"
-                style={{ color: theme.colors.onSecondaryContainer }}
+                style={{ color: colors.onPrimaryContainer }}
               >
-                {pendingCount}
+                {totalOT}
               </Text>
               <Text
-                variant="labelSmall"
-                style={{ color: theme.colors.onSurfaceVariant }}
+                variant="labelMedium"
+                style={{ color: colors.onSurfaceVariant }}
               >
-                Pending approvals
+                OT hours
               </Text>
             </View>
           </View>
 
-          <Pressable
-            onPress={() => submitOvertime(form)}
+          <View
             style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: design.spacing.xs,
-              paddingVertical: design.spacing.md,
+              flex: 1,
+              padding: design.spacing.md,
               borderRadius: design.radii.lg,
-              backgroundColor: theme.colors.primary,
+              backgroundColor: colors.secondaryContainer,
+              justifyContent: "space-between",
             }}
           >
-            <Plus size={18} color={theme.colors.onPrimary} />
-            <Text
-              variant="labelLarge"
-              style={{ color: theme.colors.onPrimary }}
-            >
-              Apply overtime
-            </Text>
-          </Pressable>
+            <Calendar
+              size={24}
+              color={colors.onSecondaryContainer}
+              style={{ alignSelf: "flex-end" }}
+            />
+
+            <View>
+              <Text
+                variant="headlineLarge"
+                style={{ color: colors.onSecondaryContainer }}
+              >
+                {pendingOT}
+              </Text>
+              <Text
+                variant="labelSmall"
+                style={{ color: colors.onSurfaceVariant }}
+              >
+                Pending
+              </Text>
+            </View>
+          </View>
         </View>
+
+        <Button
+          mode="contained"
+          onPress={() => router.push("/(tabs)/c/otForm")}
+          icon={({ size, color }) => <Plus size={size} color={color} />}
+          contentStyle={{ gap: design.spacing.xs }}
+          style={{ width: "100%" }}
+        >
+          Log overtime
+        </Button>
       </View>
 
       <View style={{ paddingVertical: design.spacing.md }}>
@@ -132,10 +122,10 @@ export default function OvertimeUI() {
                 borderRadius: 18,
                 alignItems: "center",
                 justifyContent: "center",
-                backgroundColor: theme.colors.surfaceVariant,
+                backgroundColor: colors.surfaceVariant,
               }}
             >
-              <Menu size={18} color={theme.colors.onSurfaceVariant} />
+              <Menu size={18} color={colors.onSurfaceVariant} />
             </View>
           }
         />
@@ -153,24 +143,21 @@ export default function OvertimeUI() {
                 style={{
                   padding: design.spacing.md,
                   borderRadius: design.radii.lg,
-                  backgroundColor: theme.colors.surface,
+                  backgroundColor: colors.surface,
                 }}
               >
-                <Text
-                  variant="bodyMedium"
-                  style={{ color: theme.colors.onSurface }}
-                >
+                <Text variant="bodyMedium" style={{ color: colors.onSurface }}>
                   {item.reason}
                 </Text>
                 <Text
                   variant="bodySmall"
-                  style={{ color: theme.colors.onSurfaceVariant }}
+                  style={{ color: colors.onSurfaceVariant }}
                 >
                   {item.date} · {item.hours}h
                 </Text>
                 <Text
                   variant="labelSmall"
-                  style={{ color: theme.colors.primary, marginTop: 4 }}
+                  style={{ color: colors.primary, marginTop: 4 }}
                 >
                   {item.status}
                 </Text>

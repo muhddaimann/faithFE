@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { View } from "react-native";
-import { Text, Button } from "react-native-paper";
+import { Text, Button, useTheme } from "react-native-paper";
 import { CalendarCheck, Hourglass } from "lucide-react-native";
-import { useAppTheme } from "../../contexts/themeContext";
 import { useDesign } from "../../contexts/designContext";
 
 type LeaveState = "empty" | "normal";
@@ -13,9 +12,8 @@ type LeaveUIProps = {
 };
 
 export default function LeaveUI({ annualBalance, pendingCount }: LeaveUIProps) {
-  const { theme } = useAppTheme();
+  const { colors } = useTheme();
   const { design } = useDesign();
-
   const [state, setState] = useState<LeaveState>("normal");
 
   const isEmpty = state === "empty";
@@ -28,39 +26,31 @@ export default function LeaveUI({ annualBalance, pendingCount }: LeaveUIProps) {
             flex: 1,
             padding: design.spacing.md,
             borderRadius: design.radii.lg,
-            backgroundColor: theme.colors.primaryContainer,
+            backgroundColor: colors.primaryContainer,
+            justifyContent: "space-between",
+            minHeight: 140,
           }}
         >
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 6,
-              marginBottom: 6,
-            }}
-          >
-            <CalendarCheck size={16} color={theme.colors.onPrimaryContainer} />
+          <CalendarCheck
+            size={20}
+            color={colors.onPrimaryContainer}
+            style={{ alignSelf: "flex-end" }}
+          />
+
+          <View>
+            <Text
+              variant="headlineSmall"
+              style={{ color: colors.onPrimaryContainer }}
+            >
+              {isEmpty ? 0 : annualBalance}
+            </Text>
             <Text
               variant="labelSmall"
-              style={{ color: theme.colors.onPrimaryContainer }}
+              style={{ color: colors.onSurfaceVariant }}
             >
-              Annual Leave
+              Annual leave remaining
             </Text>
           </View>
-
-          <Text
-            variant="headlineSmall"
-            style={{ color: theme.colors.onPrimaryContainer }}
-          >
-            {isEmpty ? 0 : annualBalance}
-          </Text>
-
-          <Text
-            variant="bodySmall"
-            style={{ color: theme.colors.onPrimaryContainer }}
-          >
-            days remaining
-          </Text>
         </View>
 
         <View
@@ -68,39 +58,30 @@ export default function LeaveUI({ annualBalance, pendingCount }: LeaveUIProps) {
             flex: 1,
             padding: design.spacing.md,
             borderRadius: design.radii.lg,
-            backgroundColor: theme.colors.secondaryContainer,
+            backgroundColor: colors.secondaryContainer,
+            justifyContent: "space-between",
           }}
         >
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 6,
-              marginBottom: 6,
-            }}
-          >
-            <Hourglass size={16} color={theme.colors.onSecondaryContainer} />
+          <Hourglass
+            size={20}
+            color={colors.onSecondaryContainer}
+            style={{ alignSelf: "flex-end" }}
+          />
+
+          <View>
+            <Text
+              variant="headlineSmall"
+              style={{ color: colors.onSecondaryContainer }}
+            >
+              {isEmpty ? 0 : pendingCount}
+            </Text>
             <Text
               variant="labelSmall"
-              style={{ color: theme.colors.onSecondaryContainer }}
+              style={{ color: colors.onSurfaceVariant }}
             >
-              Pending Requests
+              Pending requests
             </Text>
           </View>
-
-          <Text
-            variant="headlineSmall"
-            style={{ color: theme.colors.onSecondaryContainer }}
-          >
-            {isEmpty ? 0 : pendingCount}
-          </Text>
-
-          <Text
-            variant="bodySmall"
-            style={{ color: theme.colors.onSecondaryContainer }}
-          >
-            awaiting approval
-          </Text>
         </View>
       </View>
 

@@ -9,16 +9,24 @@ export default function Welcome() {
   const { theme } = useAppTheme();
   const { design } = useDesign();
 
-  const opacity = useRef(new Animated.Value(1)).current;
+  const opacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.timing(opacity, {
-      toValue: 0,
-      duration: 400,
-      delay: 800,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: true,
-    }).start(() => {
+    Animated.sequence([
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 400,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.delay(800),
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 400,
+        easing: Easing.in(Easing.cubic),
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
       router.replace("/(tabs)/a");
     });
   }, []);

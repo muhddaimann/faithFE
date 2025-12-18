@@ -1,9 +1,8 @@
 import React from "react";
 import { View, TouchableOpacity } from "react-native";
-import { Text } from "react-native-paper";
+import { Text, useTheme } from "react-native-paper";
 import { ChevronLeft } from "lucide-react-native";
 import { useRouter } from "expo-router";
-import { useAppTheme } from "../../contexts/themeContext";
 import { useDesign } from "../../contexts/designContext";
 
 type AppHeaderProps = {
@@ -19,7 +18,7 @@ export default function AppHeader({
   leftSlot,
   rightSlot,
 }: AppHeaderProps) {
-  const { theme } = useAppTheme();
+  const { colors } = useTheme();
   const { design } = useDesign();
   const router = useRouter();
 
@@ -27,7 +26,7 @@ export default function AppHeader({
     <View
       style={{
         paddingBottom: design.spacing.md,
-        backgroundColor: theme.colors.background,
+        backgroundColor: colors.background,
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
@@ -39,15 +38,15 @@ export default function AppHeader({
             onPress={() => router.back()}
             activeOpacity={0.8}
             style={{
-              width: 36,
-              height: 36,
-              borderRadius: 18,
+              width: 44,
+              height: 44,
+              borderRadius: design.spacing.md,
               alignItems: "center",
               justifyContent: "center",
-              backgroundColor: theme.colors.surfaceVariant,
+              backgroundColor: colors.surface,
             }}
           >
-            <ChevronLeft size={20} color={theme.colors.onSurfaceVariant} />
+            <ChevronLeft size={28} color={colors.onSurface} />
           </TouchableOpacity>
         )}
       </View>
@@ -62,7 +61,7 @@ export default function AppHeader({
         <Text
           variant="titleMedium"
           numberOfLines={1}
-          style={{ color: theme.colors.onBackground }}
+          style={{ color: colors.onBackground }}
         >
           {title}
         </Text>
@@ -71,7 +70,7 @@ export default function AppHeader({
           <Text
             variant="bodySmall"
             numberOfLines={1}
-            style={{ color: theme.colors.onSurfaceVariant }}
+            style={{ color: colors.onSurfaceVariant }}
           >
             {subtitle}
           </Text>

@@ -30,7 +30,6 @@ export function CustomTabBar({
         borderRadius: design.radii.pill,
         backgroundColor: colors.surface,
         flexDirection: "row",
-        justifyContent: "space-between",
         alignItems: "center",
         opacity,
         transform: [{ scale }],
@@ -44,7 +43,7 @@ export function CustomTabBar({
     >
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
-        const isFocused = state.index === index;
+        const active = state.index === index;
 
         const Icon = options.tabBarIcon as React.ComponentType<{
           color: string;
@@ -59,7 +58,7 @@ export function CustomTabBar({
             : route.name;
 
         const onPress = () => {
-          if (!isFocused) navigation.navigate(route.name);
+          if (!active) navigation.navigate(route.name);
         };
 
         return (
@@ -72,20 +71,21 @@ export function CustomTabBar({
               minHeight: design.sizes.touch.minHeight,
               alignItems: "center",
               justifyContent: "center",
-              gap: design.spacing.xxs,
+              gap: active ? design.spacing.xxs : 2,
             }}
           >
             {Icon && (
               <Icon
-                size={design.sizes.icon.md}
-                color={isFocused ? colors.primary : colors.onSurfaceVariant}
+                size={active ? design.sizes.icon.lg : design.sizes.icon.md}
+                color={active ? colors.primary : colors.onSurfaceVariant}
               />
             )}
 
             <Text
-              variant="labelSmall"
+              variant={active ? "labelMedium" : "labelSmall"}
               style={{
-                color: isFocused ? colors.primary : colors.onSurfaceVariant,
+                color: active ? colors.primary : colors.onSurfaceVariant,
+                fontWeight: active ? "600" : "400",
               }}
             >
               {label}

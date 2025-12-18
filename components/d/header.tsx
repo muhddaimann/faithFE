@@ -69,7 +69,6 @@ export default function Header() {
         style={{
           flexDirection: "row",
           gap: design.spacing.sm,
-          paddingTop: design.spacing.sm,
         }}
       >
         <Button mode="contained">Edit Profile</Button>

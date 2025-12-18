@@ -4,7 +4,6 @@ import { useAppTheme } from "../../../contexts/themeContext";
 import { useDesign } from "../../../contexts/designContext";
 import { useTabsUi } from "../../../contexts/tabContext";
 import Header from "../../../components/c/header";
-import useApply from "../../../hooks/useApply";
 import LeaveUI from "../../../components/c/leaveUI";
 import ClaimUI from "../../../components/c/claimUI";
 import OvertimeUI from "../../../components/c/overtimeUI";
@@ -16,8 +15,6 @@ export default function Apply() {
   const { theme } = useAppTheme();
   const { design } = useDesign();
   const { updateByOffset } = useTabsUi();
-  const { balances, applications, submitLeave, initialForm } = useApply();
-  const [form, setForm] = useState(initialForm);
   const [activeTab, setActiveTab] = useState<ManageTab>("leave");
 
   return (
