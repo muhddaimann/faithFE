@@ -1,76 +1,132 @@
-import React, { useState } from "react";
+import React, { useMemo } from "react";
 import { View } from "react-native";
-import { Text, Card, Button, Divider } from "react-native-paper";
+import { Text, Card, Button, Divider, useTheme } from "react-native-paper";
 import {
   Calendar,
   Clock,
-  AlertCircle,
   CheckCircle2,
   XCircle,
+  PalmTree,
+  Sun,
 } from "lucide-react-native";
-import { useAppTheme } from "../../contexts/themeContext";
 import { useDesign } from "../../contexts/designContext";
+import useAttendance from "../../hooks/useAttendance";
 
-type WeeklyState = "normal" | "partial" | "absentHeavy";
+type DayType = "Work day" | "Leave" | "Public holiday" | "Off day" | "Absent";
+
+type AttendanceStatus = "On time" | "Late" | "Absent";
+
+const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"] as const;
 
 export default function WeeklyUI() {
-  const { theme } = useAppTheme();
+  const { colors } = useTheme();
   const { design } = useDesign();
+  const { weekly, nextState } = useAttendance();
 
-  const [state, setState] = useState<WeeklyState>("normal");
+  const days = useMemo(() => {
+    const dayTypes: DayType[] = [
+      "Work day",
+      "Leave",
+      "Public holiday",
+      "Off day",
+      "Absent",
+    ];
 
-  const nextState = () => {
-    const order: WeeklyState[] = ["normal", "partial", "absentHeavy"];
-    const idx = order.indexOf(state);
-    setState(order[(idx + 1) % order.length]);
-  };
+    const attendanceStatuses: AttendanceStatus[] = [
+      "On time",
+      "Late",
+      "Absent",
+    ];
 
-  const week = {
-    range: "Mon, 11 Sep – Fri, 15 Sep",
-    summary: {
-      workingDays: 5,
-      onTime: state === "absentHeavy" ? 1 : 3,
-      late: state === "normal" ? 1 : 2,
-      absent: state === "normal" ? 0 : state === "partial" ? 1 : 2,
+    return WEEKDAYS.map((day) => {
+      const type = dayTypes[Math.floor(Math.random() * dayTypes.length)];
+
+      return {
+        day,
+        type,
+        attendance:
+          type === "Work day"
+            ? attendanceStatuses[
+                Math.floor(Math.random() * attendanceStatuses.length)
+              ]
+            : undefined,
+      };
+    });
+  }, [weekly]);
+
+  const summary = useMemo(() => {
+    return {
+      onTime: days.filter(
+        (d) => d.type === "Work day" && d.attendance === "On time"
+      ).length,
+      late: days.filter((d) => d.type === "Work day" && d.attendance === "Late")
+        .length,
+      absent: days.filter(
+        (d) =>
+          d.type === "Absent" ||
+          (d.type === "Work day" && d.attendance === "Absent")
+      ).length,
+    };
+  }, [days]);
+
+  const dayTypeMeta: Record<
+    DayType,
+    { label: string; color: string; icon: any }
+  > = {
+    "Work day": {
+      label: "Work day",
+      color: colors.primaryContainer,
+      icon: Calendar,
     },
-    days:
-      state === "absentHeavy"
-        ? [
-            { day: "Mon", status: "Absent" },
-            { day: "Tue", status: "On time" },
-            { day: "Wed", status: "Absent" },
-            { day: "Thu", status: "Late" },
-            { day: "Fri", status: "Absent" },
-          ]
-        : [
-            { day: "Mon", status: "On time" },
-            { day: "Tue", status: "Late" },
-            { day: "Wed", status: "On time" },
-            { day: "Thu", status: state === "partial" ? "Absent" : "On time" },
-            { day: "Fri", status: "On time" },
-          ],
-  };
-
-  const statusMeta = {
-    "On time": {
-      icon: CheckCircle2,
-      color: theme.colors.primary,
+    Leave: {
+      label: "Leave",
+      color: colors.tertiaryContainer,
+      icon: PalmTree,
     },
-    Late: {
-      icon: Clock,
-      color: theme.colors.secondary,
+    "Public holiday": {
+      label: "Public holiday",
+      color: colors.secondaryContainer,
+      icon: Sun,
+    },
+    "Off day": {
+      label: "Off day",
+      color: colors.surfaceVariant,
+      icon: Calendar,
     },
     Absent: {
+      label: "Absent",
+      color: colors.errorContainer,
       icon: XCircle,
-      color: theme.colors.error,
+    },
+  };
+
+  const attendanceMeta: Record<
+    AttendanceStatus,
+    { label: string; color: string; icon: any }
+  > = {
+    "On time": {
+      label: "On time",
+      color: colors.primary,
+      icon: CheckCircle2,
+    },
+    Late: {
+      label: "Late",
+      color: colors.secondary,
+      icon: Clock,
+    },
+    Absent: {
+      label: "Absent",
+      color: colors.error,
+      icon: XCircle,
     },
   };
 
   return (
     <View style={{ gap: design.spacing.md, marginBottom: design.spacing.lg }}>
+      {/* Header */}
       <Card
         style={{
-          backgroundColor: theme.colors.surface,
+          backgroundColor: colors.surface,
           borderRadius: design.radii.lg,
         }}
       >
@@ -83,17 +139,14 @@ export default function WeeklyUI() {
             }}
           >
             <View>
-              <Text
-                variant="titleMedium"
-                style={{ color: theme.colors.onSurface }}
-              >
-                {week.range}
+              <Text variant="titleMedium" style={{ color: colors.onSurface }}>
+                {weekly.weekLabel}
               </Text>
               <Text
                 variant="bodySmall"
-                style={{ color: theme.colors.onSurfaceVariant }}
+                style={{ color: colors.onSurfaceVariant }}
               >
-                Weekly Attendance Overview
+                Weekly attendance
               </Text>
             </View>
 
@@ -104,63 +157,51 @@ export default function WeeklyUI() {
                 borderRadius: 20,
                 alignItems: "center",
                 justifyContent: "center",
-                backgroundColor: theme.colors.primaryContainer,
+                backgroundColor: colors.primary,
               }}
             >
-              <Calendar size={18} color={theme.colors.onPrimaryContainer} />
+              <Calendar size={18} color={colors.onPrimary} />
             </View>
           </View>
 
           <Divider />
 
           <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
+            style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
             <View>
               <Text
                 variant="labelSmall"
-                style={{ color: theme.colors.onSurfaceVariant }}
+                style={{ color: colors.onSurfaceVariant }}
               >
                 On time
               </Text>
-              <Text
-                variant="bodyMedium"
-                style={{ color: theme.colors.onSurface }}
-              >
-                {week.summary.onTime}
+              <Text variant="bodyMedium" style={{ color: colors.onSurface }}>
+                {summary.onTime}
               </Text>
             </View>
 
             <View>
               <Text
                 variant="labelSmall"
-                style={{ color: theme.colors.onSurfaceVariant }}
+                style={{ color: colors.onSurfaceVariant }}
               >
                 Late
               </Text>
-              <Text
-                variant="bodyMedium"
-                style={{ color: theme.colors.onSurface }}
-              >
-                {week.summary.late}
+              <Text variant="bodyMedium" style={{ color: colors.onSurface }}>
+                {summary.late}
               </Text>
             </View>
 
             <View>
               <Text
                 variant="labelSmall"
-                style={{ color: theme.colors.onSurfaceVariant }}
+                style={{ color: colors.onSurfaceVariant }}
               >
                 Absent
               </Text>
-              <Text
-                variant="bodyMedium"
-                style={{ color: theme.colors.onSurface }}
-              >
-                {week.summary.absent}
+              <Text variant="bodyMedium" style={{ color: colors.onSurface }}>
+                {summary.absent}
               </Text>
             </View>
           </View>
@@ -170,14 +211,15 @@ export default function WeeklyUI() {
       {/* Daily breakdown */}
       <Card
         style={{
-          backgroundColor: theme.colors.surface,
+          backgroundColor: colors.surface,
           borderRadius: design.radii.lg,
         }}
       >
         <View style={{ padding: design.spacing.md, gap: design.spacing.sm }}>
-          {week.days.map((item, idx) => {
-            const meta = statusMeta[item.status as keyof typeof statusMeta];
-            const Icon = meta.icon;
+          {days.map((item, idx) => {
+            const dayMeta = dayTypeMeta[item.type];
+            const attendance =
+              item.attendance && attendanceMeta[item.attendance];
 
             return (
               <View key={item.day}>
@@ -190,26 +232,46 @@ export default function WeeklyUI() {
                 >
                   <Text
                     variant="bodyMedium"
-                    style={{ color: theme.colors.onSurface }}
+                    style={{ color: colors.onSurface }}
                   >
                     {item.day}
                   </Text>
 
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      gap: 6,
-                    }}
-                  >
-                    <Icon size={14} color={meta.color} />
-                    <Text variant="labelSmall" style={{ color: meta.color }}>
-                      {item.status}
-                    </Text>
+                  <View style={{ flexDirection: "row", gap: 8 }}>
+                    {/* Day type pill */}
+                    <View
+                      style={{
+                        paddingHorizontal: 10,
+                        paddingVertical: 4,
+                        borderRadius: 999,
+                        backgroundColor: dayMeta.color,
+                      }}
+                    >
+                      <Text variant="labelSmall">{dayMeta.label}</Text>
+                    </View>
+
+                    {/* Attendance pill (only for work day) */}
+                    {attendance && (
+                      <View
+                        style={{
+                          paddingHorizontal: 10,
+                          paddingVertical: 4,
+                          borderRadius: 999,
+                          backgroundColor: attendance.color + "22",
+                        }}
+                      >
+                        <Text
+                          variant="labelSmall"
+                          style={{ color: attendance.color }}
+                        >
+                          {attendance.label}
+                        </Text>
+                      </View>
+                    )}
                   </View>
                 </View>
 
-                {idx < week.days.length - 1 && (
+                {idx < days.length - 1 && (
                   <Divider style={{ marginVertical: design.spacing.sm }} />
                 )}
               </View>
@@ -218,34 +280,8 @@ export default function WeeklyUI() {
         </View>
       </Card>
 
-      {state === "absentHeavy" && (
-        <Card
-          style={{
-            backgroundColor: theme.colors.surfaceVariant,
-            borderRadius: design.radii.lg,
-          }}
-        >
-          <View
-            style={{
-              padding: design.spacing.md,
-              flexDirection: "row",
-              alignItems: "center",
-              gap: design.spacing.sm,
-            }}
-          >
-            <AlertCircle size={18} color={theme.colors.error} />
-            <Text
-              variant="bodyMedium"
-              style={{ color: theme.colors.onSurfaceVariant }}
-            >
-              High absence detected this week.
-            </Text>
-          </View>
-        </Card>
-      )}
-
       <Button mode="elevated" onPress={nextState}>
-        Next state
+        Randomize week
       </Button>
     </View>
   );

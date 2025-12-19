@@ -48,6 +48,14 @@ export default function Home() {
       <TodayUI />
 
       <SectionHeader
+        title="Attendance"
+        subtitle="Your recent records"
+        icon={Calendar}
+        onPress={() => router.push("/(tabs)/b")}
+      />
+      <AttendanceUI records={attendanceRecords} />
+
+      <SectionHeader
         title="Leave"
         subtitle="Balance & other applications"
         icon={CalendarCheck}

@@ -8,7 +8,6 @@ import {
   Clock,
   CalendarDays,
   Wallet,
-  HelpCircle,
   Info,
   LogOut,
 } from "lucide-react-native";

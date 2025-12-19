@@ -12,7 +12,7 @@ type HeaderProps = {
 };
 
 export default function Header({
-  name = "Rockstar",
+  name = "Aiman",
   status = "online",
 }: HeaderProps) {
   const { theme } = useAppTheme();

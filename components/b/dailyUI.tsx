@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { View } from "react-native";
-import { Text, Card, Button, Divider } from "react-native-paper";
+import React from "react";
+import { View, Pressable } from "react-native";
+import { Text, Card, Button, Divider, useTheme } from "react-native-paper";
 import {
   Clock,
   LogIn,
@@ -8,70 +8,63 @@ import {
   AlertCircle,
   CalendarCheck,
 } from "lucide-react-native";
-import { useAppTheme } from "../../contexts/themeContext";
 import { useDesign } from "../../contexts/designContext";
-
-type DailyState = "scheduled" | "checkedIn" | "checkedOut" | "absent";
+import useAttendance from "../../hooks/useAttendance";
 
 export default function DailyUI() {
-  const { theme } = useAppTheme();
+  const { colors } = useTheme();
   const { design } = useDesign();
-
-  const [state, setState] = useState<DailyState>("scheduled");
-
-  const nextState = () => {
-    const order: DailyState[] = [
-      "scheduled",
-      "checkedIn",
-      "checkedOut",
-      "absent",
-    ];
-    const idx = order.indexOf(state);
-    setState(order[(idx + 1) % order.length]);
-  };
-
-  const today = {
-    date: new Date().toLocaleDateString(undefined, {
-      weekday: "long",
-      month: "short",
-      day: "numeric",
-    }),
-    schedule: "09:00 AM – 06:00 PM",
-    checkIn: state !== "scheduled" ? "09:12 AM" : null,
-    checkOut: state === "checkedOut" ? "06:04 PM" : null,
-  };
+  const {
+    daily,
+    canCheckIn,
+    canCheckOut,
+    statusLabel,
+    checkIn,
+    checkOut,
+    nextState,
+  } = useAttendance();
 
   const statusMeta = {
     scheduled: {
-      label: "Scheduled workday",
       icon: CalendarCheck,
-      color: theme.colors.primary,
+      color: colors.primary,
+      description: "Your workday is scheduled. Please check in when ready.",
     },
-    checkedIn: {
-      label: "Working",
+    working: {
       icon: LogIn,
-      color: theme.colors.primary,
+      color: colors.primary,
+      description: "You’re currently working.",
     },
-    checkedOut: {
-      label: "Completed",
+    completed: {
       icon: LogOut,
-      color: theme.colors.secondary,
+      color: colors.secondary,
+      description: "Your workday is completed.",
+    },
+    autoCompleted: {
+      icon: LogOut,
+      color: colors.secondary,
+      description: "Workday was auto-completed by the system.",
     },
     absent: {
-      label: "Absent",
       icon: AlertCircle,
-      color: theme.colors.error,
+      color: colors.error,
+      description: "No attendance was recorded for today.",
     },
-  }[state];
+    onLeave: {
+      icon: CalendarCheck,
+      color: colors.tertiary,
+      description: "You’re on approved leave today.",
+    },
+  }[daily.state];
 
   const StatusIcon = statusMeta.icon;
+  const showSchedule = daily.state !== "onLeave";
 
   return (
     <View style={{ gap: design.spacing.md, marginBottom: design.spacing.lg }}>
-      {/* Summary card */}
       <Card
         style={{
-          backgroundColor: theme.colors.surface,
+          backgroundColor: colors.surface,
           borderRadius: design.radii.lg,
         }}
       >
@@ -84,17 +77,14 @@ export default function DailyUI() {
             }}
           >
             <View>
-              <Text
-                variant="titleMedium"
-                style={{ color: theme.colors.onSurface }}
-              >
-                {today.date}
+              <Text variant="titleMedium" style={{ color: colors.onSurface }}>
+                {daily.date}
               </Text>
               <Text
                 variant="bodySmall"
-                style={{ color: theme.colors.onSurfaceVariant }}
+                style={{ color: colors.onSurfaceVariant }}
               >
-                Daily attendance overview
+                Daily attendance
               </Text>
             </View>
 
@@ -105,134 +95,164 @@ export default function DailyUI() {
                 borderRadius: 20,
                 alignItems: "center",
                 justifyContent: "center",
-                backgroundColor: theme.colors.primaryContainer,
+                backgroundColor: statusMeta.color,
               }}
             >
-              <Clock size={18} color={theme.colors.onPrimaryContainer} />
+              <StatusIcon size={18} color={colors.onPrimary} />
             </View>
           </View>
 
           <Divider />
 
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: design.spacing.sm,
-            }}
-          >
-            <StatusIcon size={16} color={statusMeta.color} />
+          <View style={{ gap: 4 }}>
             <Text variant="bodyMedium" style={{ color: statusMeta.color }}>
-              {statusMeta.label}
+              {statusLabel}
             </Text>
-          </View>
 
-          <Text
-            variant="bodySmall"
-            style={{ color: theme.colors.onSurfaceVariant }}
-          >
-            Scheduled: {today.schedule}
-          </Text>
+            <Text
+              variant="bodySmall"
+              style={{ color: colors.onSurfaceVariant }}
+            >
+              {statusMeta.description}
+            </Text>
+
+            {showSchedule && (
+              <Text
+                variant="bodySmall"
+                style={{ color: colors.onSurfaceVariant, marginTop: 4 }}
+              >
+                Schedule: {daily.schedule.start} – {daily.schedule.end}
+              </Text>
+            )}
+          </View>
         </View>
       </Card>
 
-      {/* Check in / out cards */}
-      <View style={{ flexDirection: "row", gap: design.spacing.md }}>
+      {(daily.state === "onLeave" || daily.state === "absent") && (
         <Card
           style={{
-            flex: 1,
-            backgroundColor: theme.colors.surfaceVariant,
+            backgroundColor: colors.surfaceVariant,
             borderRadius: design.radii.lg,
           }}
         >
-          <View style={{ padding: design.spacing.md, gap: 6 }}>
-            <Text
-              variant="labelSmall"
-              style={{ color: theme.colors.onSurfaceVariant }}
-            >
-              Check in
-            </Text>
-
-            <Text
-              variant="titleMedium"
-              style={{ color: theme.colors.onSurface }}
-            >
-              {today.checkIn ?? "—"}
-            </Text>
-
-            {state === "scheduled" && (
-              <Button
-                mode="contained"
-                compact
-                icon={() => <LogIn size={14} color={theme.colors.onPrimary} />}
-              >
-                Check in
-              </Button>
-            )}
-          </View>
-        </Card>
-
-        <Card
-          style={{
-            flex: 1,
-            backgroundColor: theme.colors.surfaceVariant,
-            borderRadius: design.radii.lg,
-          }}
-        >
-          <View style={{ padding: design.spacing.md, gap: 6 }}>
-            <Text
-              variant="labelSmall"
-              style={{ color: theme.colors.onSurfaceVariant }}
-            >
-              Check out
-            </Text>
-
-            <Text
-              variant="titleMedium"
-              style={{ color: theme.colors.onSurface }}
-            >
-              {today.checkOut ?? "—"}
-            </Text>
-
-            {state === "checkedIn" && (
-              <Button
-                mode="contained-tonal"
-                compact
-                icon={() => (
-                  <LogOut size={14} color={theme.colors.onSecondary} />
-                )}
-              >
-                Check out
-              </Button>
-            )}
-          </View>
-        </Card>
-      </View>
-
-      {state === "absent" && (
-        <Card
-          style={{
-            backgroundColor: theme.colors.surfaceVariant,
-            borderRadius: design.radii.lg,
-          }}
-        >
-          <View
-            style={{
-              padding: design.spacing.md,
-              flexDirection: "row",
-              alignItems: "center",
-              gap: design.spacing.sm,
-            }}
-          >
-            <AlertCircle size={18} color={theme.colors.error} />
+          <View style={{ padding: design.spacing.md }}>
             <Text
               variant="bodyMedium"
-              style={{ color: theme.colors.onSurfaceVariant }}
+              style={{ color: colors.onSurfaceVariant }}
             >
-              No attendance recorded for this workday.
+              {daily.state === "onLeave"
+                ? "No attendance actions are required today."
+                : "This day will be recorded as absent."}
             </Text>
           </View>
         </Card>
+      )}
+
+      {(daily.state === "scheduled" ||
+        daily.state === "working" ||
+        daily.state === "completed" ||
+        daily.state === "autoCompleted") && (
+        <View style={{ flexDirection: "row", gap: design.spacing.md }}>
+          {/* Check in */}
+          <Pressable
+            disabled={!canCheckIn}
+            onPress={canCheckIn ? checkIn : undefined}
+            style={{
+              flex: 1,
+              padding: design.spacing.md,
+              borderRadius: design.radii.xl,
+              backgroundColor: canCheckIn
+                ? colors.primaryContainer
+                : colors.surfaceVariant,
+              justifyContent: "space-between",
+              minHeight: 140,
+              opacity: canCheckIn ? 1 : 0.6,
+            }}
+          >
+            <LogIn
+              size={28}
+              color={
+                canCheckIn ? colors.onPrimaryContainer : colors.onSurfaceVariant
+              }
+              style={{ alignSelf: "flex-end" }}
+            />
+
+            <View>
+              <Text
+                variant="labelMedium"
+                style={{
+                  color: canCheckIn
+                    ? colors.onPrimaryContainer
+                    : colors.onSurfaceVariant,
+                }}
+              >
+                Check in
+              </Text>
+
+              <Text
+                variant="titleMedium"
+                style={{
+                  color: canCheckIn
+                    ? colors.onPrimaryContainer
+                    : colors.onSurface,
+                }}
+              >
+                {daily.checkIn ?? "Tap to check in"}
+              </Text>
+            </View>
+          </Pressable>
+
+          {/* Check out */}
+          <Pressable
+            disabled={!canCheckOut}
+            onPress={canCheckOut ? checkOut : undefined}
+            style={{
+              flex: 1,
+              padding: design.spacing.md,
+              borderRadius: design.radii.xl,
+              backgroundColor: canCheckOut
+                ? colors.secondaryContainer
+                : colors.surfaceVariant,
+              justifyContent: "space-between",
+              minHeight: 140,
+              opacity: canCheckOut ? 1 : 0.6,
+            }}
+          >
+            <LogOut
+              size={28}
+              color={
+                canCheckOut
+                  ? colors.onSecondaryContainer
+                  : colors.onSurfaceVariant
+              }
+              style={{ alignSelf: "flex-end" }}
+            />
+
+            <View>
+              <Text
+                variant="labelMedium"
+                style={{
+                  color: canCheckOut
+                    ? colors.onSecondaryContainer
+                    : colors.onSurfaceVariant,
+                }}
+              >
+                Check out
+              </Text>
+
+              <Text
+                variant="titleMedium"
+                style={{
+                  color: canCheckOut
+                    ? colors.onSecondaryContainer
+                    : colors.onSurface,
+                }}
+              >
+                {daily.checkOut ?? "Tap to check out"}
+              </Text>
+            </View>
+          </Pressable>
+        </View>
       )}
 
       <Button mode="elevated" onPress={nextState}>

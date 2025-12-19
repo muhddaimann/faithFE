@@ -46,14 +46,23 @@ export default function SectionSwitcher<T extends string>({
 
       <Pressable
         onPress={() => setOpen(true)}
-        style={{
+        style={({ pressed }) => ({
           padding: design.spacing.md,
           borderRadius: design.radii.xl,
           backgroundColor: colors.surface,
           flexDirection: "row",
           alignItems: "center",
           gap: design.spacing.sm,
-        }}
+          elevation: pressed
+            ? design.elevation.level1
+            : design.elevation.level3,
+
+          shadowColor: colors.shadow,
+          shadowOpacity: pressed ? 0.08 : 0.1,
+          shadowRadius: pressed ? 2 : 4,
+          shadowOffset: { width: 0, height: pressed ? 2 : 4 },
+          transform: [{ scale: pressed ? 0.99 : 1 }],
+        })}
       >
         {ActiveIcon && (
           <View

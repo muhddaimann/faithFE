@@ -1,75 +1,232 @@
-export type AttendanceStatus = "onTime" | "late" | "wfh" | "absent";
+import { useMemo, useState } from "react";
 
-export type TodayAttendance = {
-  checkedIn: boolean;
-  checkInTime?: string;
-  workType?: "office" | "wfh";
-};
+export type AttendanceView = "daily" | "weekly" | "monthly";
 
-export type AttendanceRecord = {
-  id: string;
+export type DailyState =
+  | "scheduled"
+  | "working"
+  | "completed"
+  | "autoCompleted"
+  | "absent"
+  | "onLeave";
+
+export type DailyAttendance = {
   date: string;
-  status: AttendanceStatus;
-  note?: string;
+  schedule: {
+    start: string;
+    end: string;
+  };
+  checkIn?: string;
+  checkOut?: string;
+  state: DailyState;
 };
 
-export type AttendanceSummary = {
+export type WeeklyAttendance = {
+  weekLabel: string;
+  totalDays: number;
+  presentDays: number;
+  absentDays: number;
+  leaveDays: number;
+  totalHours: number;
+};
+
+export type MonthlyAttendance = {
+  monthLabel: string;
   workingDays: number;
-  onTime: number;
-  late: number;
-  wfh: number;
-  absent: number;
+  presentDays: number;
+  absentDays: number;
+  leaveDays: number;
+  totalHours: number;
+};
+
+const stateOrder: DailyState[] = [
+  "scheduled",
+  "working",
+  "completed",
+  "autoCompleted",
+  "absent",
+  "onLeave",
+];
+
+const toMinutes = (time: string) => {
+  const [h, m] = time.split(":").map(Number);
+  return h * 60 + m;
+};
+
+const toTime = (mins: number) => {
+  const h = Math.floor(mins / 60)
+    .toString()
+    .padStart(2, "0");
+  const m = (mins % 60).toString().padStart(2, "0");
+  return `${h}:${m}`;
+};
+
+const randomBetween = (min: number, max: number) =>
+  Math.floor(Math.random() * (max - min + 1)) + min;
+
+const generateCheckIn = (start: string) => {
+  const base = toMinutes(start);
+  const isLate = Math.random() < 0.6;
+  const offset = isLate ? randomBetween(1, 30) : randomBetween(-5, 5);
+  return toTime(base + offset);
+};
+
+const generateCheckOut = (end: string) => {
+  const base = toMinutes(end);
+  const offset = randomBetween(-10, 20);
+  return toTime(base + offset);
 };
 
 export default function useAttendance() {
-  const today: TodayAttendance = {
-    checkedIn: true,
-    checkInTime: "09:12 AM",
-    workType: "office",
+  const [view, setView] = useState<AttendanceView>("daily");
+
+  const [daily, setDaily] = useState<DailyAttendance>({
+    date: "Monday, Mar 18",
+    schedule: {
+      start: "09:00",
+      end: "18:00",
+    },
+    state: "scheduled",
+  });
+
+  const weekly: WeeklyAttendance = {
+    weekLabel: "18–22 Mar",
+    totalDays: 5,
+    presentDays: 4,
+    absentDays: 0,
+    leaveDays: 1,
+    totalHours: 36,
   };
 
-  const summary: AttendanceSummary = {
+  const monthly: MonthlyAttendance = {
+    monthLabel: "March 2025",
     workingDays: 22,
-    onTime: 16,
-    late: 3,
-    wfh: 2,
-    absent: 1,
+    presentDays: 18,
+    absentDays: 2,
+    leaveDays: 2,
+    totalHours: 144,
   };
 
-  const records: AttendanceRecord[] = [
-    {
-      id: "1",
-      date: "Mon, 9 Sep",
-      status: "onTime",
-    },
-    {
-      id: "2",
-      date: "Tue, 10 Sep",
-      status: "onTime",
-    },
-    {
-      id: "3",
-      date: "Wed, 11 Sep",
-      status: "wfh",
-      note: "Approved WFH",
-    },
-    {
-      id: "4",
-      date: "Thu, 12 Sep",
-      status: "late",
-      note: "Traffic delay",
-    },
-    {
-      id: "5",
-      date: "Fri, 13 Sep",
-      status: "absent",
-      note: "No record",
-    },
-  ];
+  const checkIn = () => {
+    setDaily((prev) => ({
+      ...prev,
+      state: "working",
+      checkIn: generateCheckIn(prev.schedule.start),
+    }));
+  };
+
+  const checkOut = () => {
+    setDaily((prev) => ({
+      ...prev,
+      state: "completed",
+      checkOut: generateCheckOut(prev.schedule.end),
+    }));
+  };
+
+  const autoCompleteDay = () => {
+    setDaily((prev) => ({
+      ...prev,
+      state: "autoCompleted",
+      checkOut: "23:59",
+    }));
+  };
+
+  const nextState = () => {
+    setDaily((prev) => {
+      const idx = stateOrder.indexOf(prev.state);
+      const next = stateOrder[(idx + 1) % stateOrder.length];
+
+      if (next === "scheduled") {
+        return {
+          ...prev,
+          state: next,
+          checkIn: undefined,
+          checkOut: undefined,
+        };
+      }
+
+      if (next === "working") {
+        return {
+          ...prev,
+          state: next,
+          checkIn: generateCheckIn(prev.schedule.start),
+          checkOut: undefined,
+        };
+      }
+
+      if (next === "completed") {
+        return {
+          ...prev,
+          state: next,
+          checkIn: prev.checkIn ?? generateCheckIn(prev.schedule.start),
+          checkOut: generateCheckOut(prev.schedule.end),
+        };
+      }
+
+      if (next === "autoCompleted") {
+        return {
+          ...prev,
+          state: next,
+          checkIn: prev.checkIn ?? generateCheckIn(prev.schedule.start),
+          checkOut: "23:59",
+        };
+      }
+
+      if (next === "absent") {
+        return {
+          ...prev,
+          state: next,
+          checkIn: undefined,
+          checkOut: undefined,
+        };
+      }
+
+      return {
+        ...prev,
+        state: "onLeave",
+        checkIn: undefined,
+        checkOut: undefined,
+      };
+    });
+  };
+
+  const canCheckIn = daily.state === "scheduled";
+  const canCheckOut = daily.state === "working";
+
+  const statusLabel = useMemo(() => {
+    switch (daily.state) {
+      case "scheduled":
+        return "Scheduled workday";
+      case "working":
+        return "Working";
+      case "completed":
+        return "Completed";
+      case "autoCompleted":
+        return "Completed (auto)";
+      case "absent":
+        return "Absent";
+      case "onLeave":
+        return "On leave";
+      default:
+        return "";
+    }
+  }, [daily.state]);
 
   return {
-    today,
-    summary,
-    records,
+    view,
+    setView,
+
+    daily,
+    weekly,
+    monthly,
+
+    canCheckIn,
+    canCheckOut,
+    statusLabel,
+
+    checkIn,
+    checkOut,
+    autoCompleteDay,
+    nextState,
   };
 }
