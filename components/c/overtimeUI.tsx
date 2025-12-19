@@ -7,28 +7,36 @@ import {
   Plus,
   ChevronDown,
   ChevronUp,
-  Menu,
   Calendar,
 } from "lucide-react-native";
 import { router } from "expo-router";
 import { useDesign } from "../../contexts/designContext";
-import SectionHeader from "../shared/sectionHeader";
+import StatusFilter from "../shared/statusFilter";
 import NoDataUI from "../shared/nodataUI";
 import useOvertime from "../../hooks/useOvertime";
+
+type Status = "all" | "pending" | "approved" | "cancelled";
 
 export default function OvertimeUI() {
   const { colors } = useTheme();
   const { design } = useDesign();
-  const { summary, records, initialForm, submitOvertime, toggleMock } =
-    useOvertime();
+  const { summary, records, initialForm, toggleMock } = useOvertime();
 
   const [expanded, setExpanded] = useState(false);
-  const [form, setForm] = useState(initialForm);
+  const [form] = useState(initialForm);
+  const [statusFilter, setStatusFilter] = useState<Status>("all");
 
   const totalOT = summary?.totalHours ?? 0;
   const pendingOT = records.filter((r) => r.status === "pending").length;
 
-  const displayRecords = expanded ? records : records.slice(0, 3);
+  const filteredRecords =
+    statusFilter === "all"
+      ? records
+      : records.filter((r) => r.status === statusFilter);
+
+  const displayRecords = expanded
+    ? filteredRecords
+    : filteredRecords.slice(0, 3);
 
   return (
     <View>
@@ -110,30 +118,12 @@ export default function OvertimeUI() {
       </View>
 
       <View style={{ paddingVertical: design.spacing.md }}>
-        <SectionHeader
-          title="Overtime"
-          subtitle="Hours & approvals"
-          icon={Timer}
-          rightSlot={
-            <View
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: 18,
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: colors.surfaceVariant,
-              }}
-            >
-              <Menu size={18} color={colors.onSurfaceVariant} />
-            </View>
-          }
-        />
+        <StatusFilter value={statusFilter} onChange={setStatusFilter} />
 
-        {records.length === 0 ? (
+        {filteredRecords.length === 0 ? (
           <NoDataUI
             title="No overtime records"
-            description="Your overtime submissions will appear here."
+            description="No records match the selected status."
           />
         ) : (
           <View style={{ gap: design.spacing.sm }}>
@@ -164,7 +154,7 @@ export default function OvertimeUI() {
               </View>
             ))}
 
-            {records.length > 3 && (
+            {filteredRecords.length > 3 && (
               <Button
                 mode="contained"
                 onPress={() => setExpanded(!expanded)}
@@ -183,10 +173,6 @@ export default function OvertimeUI() {
           </View>
         )}
       </View>
-
-      <Button mode="elevated" onPress={toggleMock} style={{ width: "100%" }}>
-        Next state
-      </Button>
     </View>
   );
 }

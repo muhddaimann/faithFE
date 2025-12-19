@@ -7,25 +7,33 @@ import {
   Plus,
   ChevronDown,
   ChevronUp,
-  Menu,
 } from "lucide-react-native";
 import { router } from "expo-router";
 import { useDesign } from "../../contexts/designContext";
-import SectionHeader from "../shared/sectionHeader";
+import StatusFilter from "../shared/statusFilter";
 import NoDataUI from "../shared/nodataUI";
 import useWork from "../../hooks/useWork";
+
+type Status = "all" | "pending" | "approved" | "cancelled";
 
 export default function WorkUI() {
   const { colors } = useTheme();
   const { design } = useDesign();
-  const { summary, items, initialForm, submitWork, toggleMock } = useWork();
+  const { summary, items, initialForm, toggleMock } = useWork();
+
   const [expanded, setExpanded] = useState(false);
-  const [form, setForm] = useState(initialForm);
+  const [form] = useState(initialForm);
+  const [statusFilter, setStatusFilter] = useState<Status>("all");
 
   const workCount = summary?.total ?? items.length;
   const pendingWork = items.filter((i) => i.status === "pending").length;
 
-  const displayItems = expanded ? items : items.slice(0, 3);
+  const filteredItems =
+    statusFilter === "all"
+      ? items
+      : items.filter((i) => i.status === statusFilter);
+
+  const displayItems = expanded ? filteredItems : filteredItems.slice(0, 3);
 
   return (
     <View>
@@ -107,30 +115,12 @@ export default function WorkUI() {
       </View>
 
       <View style={{ paddingVertical: design.spacing.md }}>
-        <SectionHeader
-          title="Work"
-          subtitle="Tasks & logs"
-          icon={Briefcase}
-          rightSlot={
-            <View
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: 18,
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: colors.surfaceVariant,
-              }}
-            >
-              <Menu size={18} color={colors.onSurfaceVariant} />
-            </View>
-          }
-        />
+        <StatusFilter value={statusFilter} onChange={setStatusFilter} />
 
-        {items.length === 0 ? (
+        {filteredItems.length === 0 ? (
           <NoDataUI
             title="No work records"
-            description="Your work logs will appear here."
+            description="No records match the selected status."
           />
         ) : (
           <View style={{ gap: design.spacing.sm }}>
@@ -161,7 +151,7 @@ export default function WorkUI() {
               </View>
             ))}
 
-            {items.length > 3 && (
+            {filteredItems.length > 3 && (
               <Button
                 mode="contained"
                 onPress={() => setExpanded(!expanded)}
@@ -180,10 +170,6 @@ export default function WorkUI() {
           </View>
         )}
       </View>
-
-      <Button mode="elevated" onPress={toggleMock} style={{ width: "100%" }}>
-        Next state
-      </Button>
     </View>
   );
 }

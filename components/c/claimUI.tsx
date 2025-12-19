@@ -7,28 +7,34 @@ import {
   Plus,
   ChevronDown,
   ChevronUp,
-  Menu,
 } from "lucide-react-native";
 import { router } from "expo-router";
 import { useDesign } from "../../contexts/designContext";
-import SectionHeader from "../shared/sectionHeader";
+import StatusFilter from "../shared/statusFilter";
 import NoDataUI from "../shared/nodataUI";
 import useClaim from "../../hooks/useClaim";
+
+type Status = "all" | "pending" | "approved" | "cancelled";
 
 export default function ClaimUI() {
   const { colors } = useTheme();
   const { design } = useDesign();
-
-  const { balances, claims, initialForm, submitClaim, toggleMock } = useClaim();
+  const { balances, claims, initialForm, toggleMock } = useClaim();
 
   const [expanded, setExpanded] = useState(false);
-  const [form, setForm] = useState(initialForm);
+  const [form] = useState(initialForm);
+  const [statusFilter, setStatusFilter] = useState<Status>("all");
 
   const primaryBalance = balances[0];
   const claimBalance = primaryBalance?.remaining ?? 0;
   const pendingClaims = claims.filter((c) => c.status === "pending").length;
 
-  const displayClaims = expanded ? claims : claims.slice(0, 3);
+  const filteredClaims =
+    statusFilter === "all"
+      ? claims
+      : claims.filter((c) => c.status === statusFilter);
+
+  const displayClaims = expanded ? filteredClaims : filteredClaims.slice(0, 3);
 
   return (
     <View>
@@ -110,30 +116,12 @@ export default function ClaimUI() {
       </View>
 
       <View style={{ paddingVertical: design.spacing.md }}>
-        <SectionHeader
-          title="Claims"
-          subtitle="History & status"
-          icon={Receipt}
-          rightSlot={
-            <View
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: 18,
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: colors.surfaceVariant,
-              }}
-            >
-              <Menu size={18} color={colors.onSurfaceVariant} />
-            </View>
-          }
-        />
+        <StatusFilter value={statusFilter} onChange={setStatusFilter} />
 
-        {claims.length === 0 ? (
+        {filteredClaims.length === 0 ? (
           <NoDataUI
-            title="No claims yet"
-            description="Your submitted claims will appear here."
+            title="No claims found"
+            description="No claims match the selected status."
           />
         ) : (
           <View style={{ gap: design.spacing.sm }}>
@@ -164,7 +152,7 @@ export default function ClaimUI() {
               </View>
             ))}
 
-            {claims.length > 3 && (
+            {filteredClaims.length > 3 && (
               <Button
                 mode="contained"
                 onPress={() => setExpanded(!expanded)}
@@ -183,10 +171,6 @@ export default function ClaimUI() {
           </View>
         )}
       </View>
-
-      <Button mode="elevated" onPress={toggleMock} style={{ width: "100%" }}>
-        Next state
-      </Button>
     </View>
   );
 }

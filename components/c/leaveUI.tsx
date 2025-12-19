@@ -6,30 +6,37 @@ import {
   Clock,
   ChevronDown,
   ChevronUp,
-  Menu,
   Plus,
 } from "lucide-react-native";
 import { useDesign } from "../../contexts/designContext";
-import SectionHeader from "../shared/sectionHeader";
+import StatusFilter from "../shared/statusFilter";
 import NoDataUI from "../shared/nodataUI";
 import useLeave from "../../hooks/useLeave";
 import { router } from "expo-router";
 
+type Status = "all" | "pending" | "approved" | "cancelled";
+
 export default function LeaveUI() {
   const { colors } = useTheme();
   const { design } = useDesign();
-  const { balances, applications, initialForm, submitLeave, toggleMock } =
-    useLeave();
+  const { balances, applications, initialForm } = useLeave();
   const [expanded, setExpanded] = useState(false);
   const [form] = useState(initialForm);
+  const [statusFilter, setStatusFilter] = useState<Status>("all");
+
   const primaryBalance = balances[0];
   const pendingCount = applications.filter(
     (a) => a.status === "pending"
   ).length;
 
+  const filteredApplications =
+    statusFilter === "all"
+      ? applications
+      : applications.filter((a) => a.status === statusFilter);
+
   const displayApplications = expanded
-    ? applications
-    : applications.slice(0, 3);
+    ? filteredApplications
+    : filteredApplications.slice(0, 3);
 
   return (
     <View>
@@ -103,9 +110,7 @@ export default function LeaveUI() {
           mode="contained"
           onPress={() => router.push("/(tabs)/c/leaveForm")}
           icon={({ size, color }) => <Plus size={size} color={color} />}
-          contentStyle={{
-            gap: design.spacing.xs,
-          }}
+          contentStyle={{ gap: design.spacing.xs }}
           style={{ width: "100%" }}
         >
           Apply leave
@@ -113,27 +118,9 @@ export default function LeaveUI() {
       </View>
 
       <View style={{ paddingVertical: design.spacing.md }}>
-        <SectionHeader
-          title="Leave"
-          subtitle="Balance & applications"
-          icon={CalendarCheck}
-          rightSlot={
-            <View
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: 18,
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: colors.surfaceVariant,
-              }}
-            >
-              <Menu size={18} color={colors.onSurfaceVariant} />
-            </View>
-          }
-        />
+        <StatusFilter value={statusFilter} onChange={setStatusFilter} />
 
-        {applications.length === 0 ? (
+        {filteredApplications.length === 0 ? (
           <NoDataUI
             title="No leave applications"
             description="Your leave history will appear here once you apply."
@@ -167,7 +154,7 @@ export default function LeaveUI() {
               </View>
             ))}
 
-            {applications.length > 3 && (
+            {filteredApplications.length > 3 && (
               <Button
                 mode="contained"
                 onPress={() => setExpanded(!expanded)}
@@ -185,10 +172,6 @@ export default function LeaveUI() {
           </View>
         )}
       </View>
-
-      <Button mode="elevated" onPress={toggleMock} style={{ width: "100%" }}>
-        Next state
-      </Button>
     </View>
   );
 }
