@@ -208,7 +208,6 @@ export default function WeeklyUI() {
         </View>
       </Card>
 
-      {/* Daily breakdown */}
       <Card
         style={{
           backgroundColor: colors.surface,
@@ -238,7 +237,6 @@ export default function WeeklyUI() {
                   </Text>
 
                   <View style={{ flexDirection: "row", gap: 8 }}>
-                    {/* Day type pill */}
                     <View
                       style={{
                         paddingHorizontal: 10,
@@ -250,7 +248,6 @@ export default function WeeklyUI() {
                       <Text variant="labelSmall">{dayMeta.label}</Text>
                     </View>
 
-                    {/* Attendance pill (only for work day) */}
                     {attendance && (
                       <View
                         style={{
@@ -279,10 +276,6 @@ export default function WeeklyUI() {
           })}
         </View>
       </Card>
-
-      <Button mode="elevated" onPress={nextState}>
-        Randomize week
-      </Button>
     </View>
   );
 }

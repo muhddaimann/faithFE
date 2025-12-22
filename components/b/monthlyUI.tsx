@@ -98,7 +98,8 @@ export default function MonthlyUI() {
                 justifyContent: "center",
                 backgroundColor: month.health.color,
               }}
-            >r
+            >
+              r
               <Calendar size={20} color={colors.onPrimary} />
             </View>
           </View>
@@ -228,10 +229,6 @@ export default function MonthlyUI() {
           </View>
         </Card>
       )}
-
-      <Button mode="elevated" onPress={nextState}>
-        Next state
-      </Button>
     </View>
   );
 }

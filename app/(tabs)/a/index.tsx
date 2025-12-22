@@ -38,7 +38,7 @@ export default function Home() {
       style={{ flex: 1, backgroundColor: theme.colors.background }}
       contentContainerStyle={{
         padding: design.spacing.md,
-        paddingBottom: design.spacing["2xl"] * 4,
+        paddingBottom: design.spacing["2xl"] * 3,
       }}
       onScroll={(e) => updateByOffset(e.nativeEvent.contentOffset.y)}
       scrollEventThrottle={16}
@@ -48,13 +48,12 @@ export default function Home() {
       <TodayUI />
 
       <SectionHeader
-        title="Attendance"
-        subtitle="Your recent records"
-        icon={Calendar}
-        onPress={() => router.push("/(tabs)/b")}
+        title="Announcements"
+        subtitle="Company updates"
+        icon={Bell}
+        onPress={() => router.push("/(tabs)/a/announcement")}
       />
-      <AttendanceUI records={attendanceRecords} />
-
+      <AnnouncementUI />
       <SectionHeader
         title="Leave"
         subtitle="Balance & other applications"
@@ -62,14 +61,6 @@ export default function Home() {
         onPress={() => router.push("/(tabs)/c")}
       />
       <LeaveUI annualBalance={leave.balance} pendingCount={leave.pending} />
-
-      <SectionHeader
-        title="Announcements"
-        subtitle="Company updates"
-        icon={Bell}
-        onPress={() => router.push("/(tabs)/a/announcement")}
-      />
-      <AnnouncementUI />
     </ScrollView>
   );
 }

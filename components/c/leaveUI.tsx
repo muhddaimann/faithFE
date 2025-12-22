@@ -50,6 +50,11 @@ export default function LeaveUI() {
               backgroundColor: colors.primaryContainer,
               justifyContent: "space-between",
               minHeight: 160,
+              elevation: design.elevation.level3,
+              shadowColor: colors.shadow,
+              shadowOpacity: 0.12,
+              shadowRadius: 6,
+              shadowOffset: { width: 0, height: 4 },
             }}
           >
             <CalendarCheck
@@ -127,32 +132,73 @@ export default function LeaveUI() {
           />
         ) : (
           <View style={{ gap: design.spacing.sm }}>
-            {displayApplications.map((item) => (
-              <View
-                key={item.id}
-                style={{
-                  padding: design.spacing.md,
-                  borderRadius: design.radii.lg,
-                  backgroundColor: colors.surface,
-                }}
-              >
-                <Text variant="bodyMedium" style={{ color: colors.onSurface }}>
-                  {item.type}
-                </Text>
-                <Text
-                  variant="bodySmall"
-                  style={{ color: colors.onSurfaceVariant }}
+            {displayApplications.map((item) => {
+              const statusColor =
+                item.status === "approved"
+                  ? colors.primary
+                  : item.status === "pending"
+                  ? colors.secondary
+                  : colors.error;
+
+              return (
+                <View
+                  key={item.id}
+                  style={{
+                    padding: design.spacing.md,
+                    borderRadius: design.radii.lg,
+                    backgroundColor: colors.surface,
+                    gap: design.spacing.xs,
+                  }}
                 >
-                  {item.dateRange}
-                </Text>
-                <Text
-                  variant="labelSmall"
-                  style={{ color: colors.primary, marginTop: 4 }}
-                >
-                  {item.status}
-                </Text>
-              </View>
-            ))}
+                  <Text
+                    variant="titleSmall"
+                    style={{ color: colors.onSurface }}
+                    numberOfLines={1}
+                  >
+                    {item.type}
+                  </Text>
+
+                  <Text
+                    variant="bodySmall"
+                    style={{ color: colors.onSurfaceVariant }}
+                  >
+                    {item.dateRange}
+                  </Text>
+
+                  <View
+                    style={{
+                      marginTop: design.spacing.xs,
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Text
+                      variant="labelSmall"
+                      style={{ color: colors.onSurfaceVariant }}
+                    >
+                      {item.dateRange}
+                    </Text>
+
+                    <View
+                      style={{
+                        paddingHorizontal: design.spacing.sm,
+                        paddingVertical: 2,
+                        borderRadius: design.radii.full,
+                        backgroundColor: statusColor + "20",
+                      }}
+                    >
+                      <Text
+                        variant="labelSmall"
+                        style={{ color: statusColor, fontWeight: "600" }}
+                      >
+                        {item.status}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              );
+            })}
 
             {filteredApplications.length > 3 && (
               <Button

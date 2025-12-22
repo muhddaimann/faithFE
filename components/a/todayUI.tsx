@@ -1,34 +1,29 @@
 import React, { useState, useMemo } from "react";
-import { View } from "react-native";
-import { Text, Card, Button, Divider } from "react-native-paper";
-import { CalendarOff, Clock, LogIn, LogOut, Plane } from "lucide-react-native";
-import { useAppTheme } from "../../contexts/themeContext";
+import { View, Pressable } from "react-native";
+import { Text, Card, Button, useTheme } from "react-native-paper";
+import {
+  CalendarOff,
+  LogIn,
+  LogOut,
+  AlertCircle,
+  CalendarCheck,
+  Plane,
+} from "lucide-react-native";
 import { useDesign } from "../../contexts/designContext";
 
 type TodayState =
   | "publicHoliday"
-  | "notCheckedIn"
-  | "checkedIn"
-  | "checkedOut"
+  | "scheduled"
+  | "working"
+  | "completed"
+  | "absent"
   | "onLeave";
 
 export default function TodayUI() {
-  const { theme } = useAppTheme();
+  const { colors } = useTheme();
   const { design } = useDesign();
 
-  const [state, setState] = useState<TodayState>("publicHoliday");
-
-  const nextState = () => {
-    const order: TodayState[] = [
-      "publicHoliday",
-      "notCheckedIn",
-      "checkedIn",
-      "checkedOut",
-      "onLeave",
-    ];
-    const idx = order.indexOf(state);
-    setState(order[(idx + 1) % order.length]);
-  };
+  const [state, setState] = useState<TodayState>("scheduled");
 
   const now = useMemo(() => new Date(), [state]);
 
@@ -37,72 +32,105 @@ export default function TodayUI() {
 
   const formatDate = (d: Date) =>
     d.toLocaleDateString(undefined, {
-      weekday: "short",
+      weekday: "long",
       month: "short",
-      day: "2-digit",
+      day: "numeric",
     });
 
   const checkInTime = formatTime(now);
   const checkOutTime = formatTime(new Date(now.getTime() + 9 * 60 * 60 * 1000));
 
-  const config = {
-    publicHoliday: {
-      icon: CalendarOff,
-      label: "Public Holiday",
-      subtitle: "No work required",
+  const STATE_ORDER: TodayState[] = [
+    "scheduled",
+    "working",
+    "completed",
+    "absent",
+    "onLeave",
+    "publicHoliday",
+  ];
+
+  const STATUS_META_MAP: Record<
+    TodayState,
+    {
+      icon: React.ComponentType<{ size?: number; color?: string }>;
+      color: string;
+      label: string;
+      subtitle: string;
+      extra?: string;
+    }
+  > = {
+    scheduled: {
+      icon: CalendarCheck,
+      color: colors.primary,
+      label: "Scheduled",
+      subtitle: "Ready to start work",
+      extra: "Shift · 09:00 – 18:00",
     },
-    notCheckedIn: {
-      icon: Clock,
-      label: "Not checked in",
-      subtitle: "Workday not started",
-    },
-    checkedIn: {
+    working: {
       icon: LogIn,
-      label: "Checked in",
+      color: colors.primary,
+      label: "Working",
       subtitle: "Work in progress",
+      extra: "Shift · 09:00 – 18:00",
     },
-    checkedOut: {
+    completed: {
       icon: LogOut,
-      label: "Checked out",
-      subtitle: "Workday completed",
+      color: colors.secondary,
+      label: "Completed",
+      subtitle: "Workday finished",
+      extra: "Total · 9h",
+    },
+    absent: {
+      icon: AlertCircle,
+      color: colors.error,
+      label: "Absent",
+      subtitle: "No attendance recorded",
     },
     onLeave: {
       icon: Plane,
+      color: colors.tertiary,
       label: "On leave",
       subtitle: "Approved leave",
+      extra: "Annual Leave",
     },
-  }[state];
+    publicHoliday: {
+      icon: CalendarOff,
+      color: colors.secondary,
+      label: "Public holiday",
+      subtitle: "No work required",
+      extra: "Malaysia Day",
+    },
+  };
 
-  const Icon = config.icon;
+  const STATUS_META = STATUS_META_MAP[state] ?? STATUS_META_MAP.publicHoliday;
+  const StatusIcon = STATUS_META.icon;
+
+  const canCheckIn = state === "scheduled";
+  const canCheckOut = state === "working";
 
   return (
     <View style={{ marginBottom: design.spacing.lg }}>
       <Card
         style={{
-          backgroundColor: theme.colors.surface,
-          borderRadius: design.radii.lg,
+          backgroundColor: colors.surface,
+          borderRadius: design.radii.xl,
         }}
       >
-        <View style={{ padding: design.spacing.md, gap: design.spacing.md }}>
+        <View style={{ padding: design.spacing.lg, gap: design.spacing.md }}>
           <View
             style={{
               flexDirection: "row",
-              alignItems: "center",
               justifyContent: "space-between",
+              alignItems: "center",
             }}
           >
             <View>
-              <Text
-                variant="titleMedium"
-                style={{ color: theme.colors.onSurface }}
-              >
-                {formatDate(now)}
-              </Text>
+              <Text variant="titleLarge">{formatDate(now)}</Text>
               <Text
                 variant="bodySmall"
-                style={{ color: theme.colors.onSurfaceVariant }}
+                style={{ color: colors.onSurfaceVariant }}
               >
-                {config.label} · {config.subtitle}
+                Daily attendance
               </Text>
             </View>
 
@@ -113,129 +141,176 @@ export default function TodayUI() {
                 borderRadius: 22,
                 alignItems: "center",
                 justifyContent: "center",
-                backgroundColor: theme.colors.primaryContainer,
+                backgroundColor: STATUS_META.color,
               }}
             >
-              <Icon size={20} color={theme.colors.onPrimaryContainer} />
+              <StatusIcon size={20} color={colors.onPrimary} />
             </View>
           </View>
 
-          {state === "publicHoliday" && (
-            <Text
-              variant="bodyMedium"
-              style={{ color: theme.colors.onSurfaceVariant }}
+          <View
+            style={{
+              backgroundColor: colors.background,
+              borderRadius: design.radii.lg,
+            }}
+          >
+            <View
+              style={{
+                padding: design.spacing.md,
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: design.spacing.md,
+              }}
             >
-              Enjoy your day off. No check-in or check-out required.
-            </Text>
-          )}
+              <View style={{ flex: 1, gap: 2 }}>
+                <Text variant="labelLarge" style={{ color: STATUS_META.color }}>
+                  {STATUS_META.label}
+                </Text>
+                <Text
+                  variant="bodySmall"
+                  style={{ color: colors.onSurfaceVariant }}
+                >
+                  {STATUS_META.subtitle}
+                </Text>
+              </View>
 
-          {state === "onLeave" && (
-            <Text
-              variant="bodyMedium"
-              style={{ color: theme.colors.onSurfaceVariant }}
-            >
-              You are on approved leave today.
-            </Text>
-          )}
+              {STATUS_META.extra && (
+                <View
+                  style={{
+                    paddingHorizontal: design.spacing.sm,
+                    paddingVertical: design.spacing.xs,
+                    borderRadius: design.radii.full,
+                    backgroundColor: colors.surface,
+                  }}
+                >
+                  <Text
+                    variant="labelSmall"
+                    style={{ color: colors.onSurfaceVariant }}
+                  >
+                    {STATUS_META.extra}
+                  </Text>
+                </View>
+              )}
+            </View>
+          </View>
 
-          {(state === "notCheckedIn" ||
-            state === "checkedIn" ||
-            state === "checkedOut") && (
-            <>
-              <View
+          {(state === "scheduled" ||
+            state === "working" ||
+            state === "completed") && (
+            <View style={{ flexDirection: "row", gap: design.spacing.md }}>
+              <Pressable
+                onPress={canCheckIn ? () => setState("working") : undefined}
+                disabled={!canCheckIn}
                 style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  gap: design.spacing.md,
+                  flex: 1,
+                  padding: design.spacing.md,
+                  borderRadius: design.radii.xl,
+                  backgroundColor: canCheckIn
+                    ? colors.primaryContainer
+                    : colors.surfaceVariant,
+                  opacity: canCheckIn ? 1 : 0.6,
                 }}
               >
-                <View style={{ flex: 1, gap: 4 }}>
-                  <Text
-                    variant="labelSmall"
-                    style={{ color: theme.colors.onSurfaceVariant }}
-                  >
-                    Check in
-                  </Text>
+                <LogIn
+                  size={24}
+                  color={
+                    canCheckIn
+                      ? colors.onPrimaryContainer
+                      : colors.onSurfaceVariant
+                  }
+                  style={{ alignSelf: "flex-end" }}
+                />
+                <Text
+                  variant="labelMedium"
+                  style={{
+                    color: canCheckIn
+                      ? colors.onPrimaryContainer
+                      : colors.onSurfaceVariant,
+                  }}
+                >
+                  Check in
+                </Text>
+                <Text
+                  variant="headlineSmall"
+                  style={{
+                    color: canCheckIn
+                      ? colors.onPrimaryContainer
+                      : colors.onSurface,
+                  }}
+                >
+                  {state === "working" || state === "completed"
+                    ? checkInTime
+                    : "Tap to check in"}
+                </Text>
+              </Pressable>
 
-                  {state === "notCheckedIn" ? (
-                    <Button
-                      mode="contained"
-                      compact
-                      icon={() => (
-                        <LogIn size={14} color={theme.colors.onPrimary} />
-                      )}
-                      buttonColor={theme.colors.primary}
-                      onPress={nextState}
-                    >
-                      Check in
-                    </Button>
-                  ) : (
-                    <Text
-                      variant="bodyMedium"
-                      style={{ color: theme.colors.onSurface }}
-                    >
-                      {checkInTime}
-                    </Text>
-                  )}
-                </View>
-
-                <View style={{ flex: 1, gap: 4 }}>
+              {state !== "scheduled" && (
+                <Pressable
+                  onPress={
+                    canCheckOut ? () => setState("completed") : undefined
+                  }
+                  disabled={!canCheckOut}
+                  style={{
+                    flex: 1,
+                    padding: design.spacing.md,
+                    borderRadius: design.radii.xl,
+                    backgroundColor: canCheckOut
+                      ? colors.secondaryContainer
+                      : colors.surfaceVariant,
+                    opacity: canCheckOut ? 1 : 0.6,
+                  }}
+                >
+                  <LogOut
+                    size={24}
+                    color={
+                      canCheckOut
+                        ? colors.onSecondaryContainer
+                        : colors.onSurfaceVariant
+                    }
+                    style={{ alignSelf: "flex-end" }}
+                  />
                   <Text
-                    variant="labelSmall"
-                    style={{ color: theme.colors.onSurfaceVariant }}
+                    variant="labelMedium"
+                    style={{
+                      color: canCheckOut
+                        ? colors.onSecondaryContainer
+                        : colors.onSurfaceVariant,
+                    }}
                   >
                     Check out
                   </Text>
+                  <Text
+                    variant="headlineSmall"
+                    style={{
+                      color: canCheckOut
+                        ? colors.onSecondaryContainer
+                        : colors.onSurface,
+                    }}
+                  >
+                    {state === "completed" ? checkOutTime : "Tap to check out"}
+                  </Text>
+                </Pressable>
+              )}
+            </View>
+          )}
 
-                  {state === "checkedIn" ? (
-                    <Button
-                      mode="contained-tonal"
-                      compact
-                      icon={() => (
-                        <LogOut size={14} color={theme.colors.onSecondary} />
-                      )}
-                      onPress={nextState}
-                    >
-                      Check out
-                    </Button>
-                  ) : state === "checkedOut" ? (
-                    <Text
-                      variant="bodyMedium"
-                      style={{ color: theme.colors.onSurface }}
-                    >
-                      {checkOutTime}
-                    </Text>
-                  ) : (
-                    <Text
-                      variant="bodyMedium"
-                      style={{ color: theme.colors.onSurfaceVariant }}
-                    >
-                      —
-                    </Text>
-                  )}
-                </View>
-              </View>
-
-              <Divider />
-
-              <Text
-                variant="bodySmall"
-                style={{ color: theme.colors.onSurfaceVariant }}
-              >
-                Work type: OFFICE
-              </Text>
-            </>
+          {(state === "onLeave" ||
+            state === "absent" ||
+            state === "publicHoliday") && (
+            <Text
+              variant="bodyMedium"
+              style={{ color: colors.onSurfaceVariant }}
+            >
+              {state === "onLeave"
+                ? "No attendance actions are required today."
+                : state === "publicHoliday"
+                ? "Enjoy your holiday."
+                : "This day will be recorded as absent."}
+            </Text>
           )}
         </View>
       </Card>
-
-      <Button
-        mode="elevated"
-        onPress={nextState}
-        style={{ marginTop: design.spacing.md }}
-      >
-        Next state
-      </Button>
     </View>
   );
 }

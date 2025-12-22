@@ -4,9 +4,9 @@ import { useAppTheme } from "../../../contexts/themeContext";
 import { useDesign } from "../../../contexts/designContext";
 import { useTabsUi } from "../../../contexts/tabContext";
 import Header from "../../../components/b/header";
-import DailyUI from "../../../components/b/dailyUI";
 import WeeklyUI from "../../../components/b/weeklyUI";
 import MonthlyUI from "../../../components/b/monthlyUI";
+import TodayUI from "../../../components/a/todayUI";
 
 type AttendanceTab = "daily" | "weekly" | "monthly";
 
@@ -30,7 +30,7 @@ export default function Attendance() {
     >
       <Header activeTab={activeTab} onTabChange={setActiveTab} />
 
-      {activeTab === "daily" && <DailyUI />}
+      {activeTab === "daily" && <TodayUI />}
       {activeTab === "weekly" && <WeeklyUI />}
       {activeTab === "monthly" && <MonthlyUI />}
     </ScrollView>
